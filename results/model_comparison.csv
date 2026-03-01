@@ -1,0 +1,7 @@
+Model,Type,F1,Qubits,Parameters
+Logistic Regression,Classical,0.619,-,-
+Random Forest,Classical,0.5854,-,-
+XGBoost,Classical,0.6818,-,-
+SVM (RBF),Classical,0.6,-,-
+VQC (Quantum),Quantum,0.5417,6,36
+Quantum Kernel SVM,Quantum,0.6829,6,-

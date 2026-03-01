@@ -1,0 +1,19 @@
+# Quantum Computing
+qiskit
+qiskit-aer
+qiskit-machine-learning
+
+# Classical ML
+scikit-learn
+xgboost
+
+# Data & Visualization
+pandas
+numpy
+matplotlib
+seaborn
+openpyxl
+
+# Jupyter
+jupyter
+ipykernel
