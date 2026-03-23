@@ -9,7 +9,7 @@ build/
 
 # Jupyter
 .ipynb_checkpoints/
-*_executed.ipynb
+
 
 # OS
 .DS_Store
