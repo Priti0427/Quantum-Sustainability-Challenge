@@ -364,12 +364,19 @@ def quantum_kernel(x1, x2, params):
 
 def kernel_matrix(X, params):
     n = len(X)
-    K = pnp.eye(n)
+    K_rows = []
     for i in range(n):
-        for j in range(i+1, n):
-            k = quantum_kernel(X[i], X[j], params)
-            K[i, j] = k
-            K[j, i] = k
+        row = []
+        for j in range(n):
+            if i == j:
+                row.append(pnp.array(1.0))
+            elif j > i:
+                row.append(quantum_kernel(X[i], X[j], params))
+            else:
+                row.append(pnp.array(0.0))  # placeholder
+        K_rows.append(pnp.stack(row))
+    K = pnp.stack(K_rows)
+    K = K + K.T - pnp.diag(pnp.diag(K))
     return K
 
 def kernel_target_alignment(K, y):
@@ -907,6 +914,100 @@ with open('../results/advanced_quantum_results.json', 'w') as f:
 resources.to_csv('../results/quantum_resource_requirements.csv', index=False)
 print('\\nResults saved to results/advanced_quantum_results.json')
 print('Resources saved to results/quantum_resource_requirements.csv')
+""")
+
+md("""\
+---
+# Section G — Time-Series Hardening: Fair Classical Baselines
+
+The QLSTM result above (R2 = see above) is tested on the **same** time-series sequences
+(2-step ZIP-code yearly features → next-year premium). For honest comparison, we train
+classical models on the **exact same** data splits: same sequences, same train/test split,
+same PCA-reduced features. This ensures the only variable is the model architecture.
+""")
+
+code("""\
+# ── Classical LSTM baseline on the same time-series data ──────────────────────
+class ClassicalLSTM(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size=1):
+        super().__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
+        self.fc = nn.Linear(hidden_size, output_size)
+    def forward(self, x):
+        _, (h_n, _) = self.lstm(x)
+        return self.fc(h_n.squeeze(0))
+
+model_clstm = ClassicalLSTM(n_qlstm_qubits, HIDDEN)
+opt_clstm = torch.optim.Adam(model_clstm.parameters(), lr=QLSTM_LR)
+dataset_cl = TensorDataset(X_t, y_t)
+loader_cl = DataLoader(dataset_cl, batch_size=QLSTM_BATCH, shuffle=True)
+
+print(f'Training Classical LSTM ({N_TS_TRAIN} samples, {QLSTM_EPOCHS} epochs)...')
+t0 = time.time()
+for epoch in range(QLSTM_EPOCHS):
+    epoch_loss = 0
+    for xb, yb in loader_cl:
+        opt_clstm.zero_grad()
+        pred = model_clstm(xb)
+        loss = criterion(pred, yb)
+        loss.backward()
+        opt_clstm.step()
+        epoch_loss += loss.item()
+    if (epoch + 1) % 10 == 0:
+        print(f'  Epoch {epoch+1:3d}  |  loss = {epoch_loss/len(loader_cl):.4f}  |  {time.time()-t0:.1f}s')
+clstm_time = time.time() - t0
+
+model_clstm.eval()
+with torch.no_grad():
+    y_pred_clstm = model_clstm(X_te_t).numpy().flatten()
+r2_clstm = r2_score(y_actual, y_pred_clstm)
+rmse_clstm = np.sqrt(mean_squared_error(y_actual, y_pred_clstm))
+
+print(f'\\n=== Classical LSTM — Task 2 (same data as QLSTM) ===')
+print(f'  R2 Score:  {r2_clstm:.4f}')
+print(f'  RMSE:      {rmse_clstm:.4f}')
+print(f'  Time:      {clstm_time:.1f}s')
+
+# ── Temporal XGBoost baseline ────────────────────────────────────────────────
+X_ts_tr_flat = X_ts_tr_q[:N_TS_TRAIN].reshape(N_TS_TRAIN, -1)
+X_ts_te_flat = X_ts_te_q.reshape(len(X_ts_te_q), -1)
+
+xgb_ts = xgb.XGBRegressor(n_estimators=200, max_depth=5, random_state=SEED)
+xgb_ts.fit(X_ts_tr_flat, y_ts_tr[:N_TS_TRAIN])
+y_pred_xgb_ts = xgb_ts.predict(X_ts_te_flat)
+
+r2_xgb_ts = r2_score(y_actual, y_pred_xgb_ts)
+rmse_xgb_ts = np.sqrt(mean_squared_error(y_actual, y_pred_xgb_ts))
+print(f'\\n=== Temporal XGBoost — Task 2 (same data as QLSTM) ===')
+print(f'  R2 Score:  {r2_xgb_ts:.4f}')
+print(f'  RMSE:      {rmse_xgb_ts:.4f}')
+
+# ── Fair comparison table ────────────────────────────────────────────────────
+print(f'\\n=== FAIR TIME-SERIES COMPARISON (identical data splits) ===')
+print(f'  {"Model":<25s} {"Type":<12s} {"R2":>8s} {"RMSE":>8s} {"Qubits":>8s}')
+print(f'  {"-"*65}')
+print(f'  {"Classical LSTM":<25s} {"Classical":<12s} {r2_clstm:>8.4f} {rmse_clstm:>8.4f} {"—":>8s}')
+print(f'  {"Temporal XGBoost":<25s} {"Classical":<12s} {r2_xgb_ts:>8.4f} {rmse_xgb_ts:>8.4f} {"—":>8s}')
+print(f'  {"QLSTM (4 qubits)":<25s} {"Quantum":<12s} {r2_qlstm:>8.4f} {rmse_qlstm:>8.4f} {n_qlstm_qubits:>8d}')
+""")
+
+md("""\
+---
+## Data Assumptions for 2026 Forecasting
+
+**Features assumed known for future prediction:**
+- ZIP-code-level fire risk scores (from state-maintained CalFire risk maps — publicly available, updated annually)
+- Historical premium patterns per ZIP (from CDI regulatory filings — reported with ~1 year lag)
+- Historical loss ratios and exposure counts (from CDI filings)
+
+**Features extrapolated / estimated:**
+- 2022-2025 premium trends (linear extrapolation from 2018-2021 slope)
+- Future fire loss amounts (estimated from risk scores and historical loss distributions)
+- Premium-per-policy growth (estimated from county-level CPI and building cost indices)
+
+**Validation protocol:** Temporal train/test split (train on 2018-2020 data, test on 2021). For
+competition claims, the 2021 test performance is the primary evidence. The 2026 predictions
+are extrapolations, not validated forecasts, and should be presented with confidence intervals.
 """)
 
 md("""\
