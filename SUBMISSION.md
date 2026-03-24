@@ -2,7 +2,7 @@
 
 ## Team Overview
 
-*[Team name and member details to be filled in]*
+*[Team name and member details ]*
 
 ## Abstract (400 words)
 
@@ -78,6 +78,6 @@ Domain-driven features (Fire Weather Index, drought indicators, hydroclimate whi
 
 ## Code Repository
 
-*[GitHub repo URL to be inserted]*
+*https://github.com/Priti0427/Quantum-Sustainability-Challenge*
 
 All notebooks, data, and results are reproducible. Pre-executed notebooks with full outputs are included. See README.md for setup instructions and pipeline documentation.
