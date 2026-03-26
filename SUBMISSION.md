@@ -1,7 +1,6 @@
 # Deloitte Quantum Sustainability Challenge — Submission
 
 ## Team Overview
-
 Priti Sagar - Drexel University
 Gautam Mahajan - University of Connecticut - Storrs
 ## Abstract
