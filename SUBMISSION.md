@@ -1,8 +1,9 @@
 # Deloitte Quantum Sustainability Challenge — Submission
 
 ## Team Overview
-Priti Sagar - Drexel University
-Gautam Mahajan - University of Connecticut - Storrs
+- Priti Sagar - Drexel University
+- Gautam Mahajan - University of Connecticut - Storrs
+  
 ## Abstract
 
 We present a hybrid quantum-classical machine learning solution for predicting California wildfire risk and mapping it to insurance premiums, addressing both Task 1A (wildfire classification) and Task 2 (premium time-series forecasting) of the Deloitte Quantum Sustainability Challenge.
