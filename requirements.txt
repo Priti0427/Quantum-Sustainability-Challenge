@@ -15,6 +15,10 @@ pennylane-qiskit
 scikit-learn
 xgboost
 
+# Hyperparameter Tuning & Explainability
+optuna
+shap
+
 # Deep Learning (for QLSTM and Transfer Learning)
 torch>=2.0
 
@@ -30,6 +34,7 @@ seaborn
 plotly
 kaleido
 openpyxl
+statsmodels
 
 # Geospatial (optional — for choropleth maps)
 # geopandas

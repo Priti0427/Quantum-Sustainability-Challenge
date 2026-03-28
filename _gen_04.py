@@ -112,9 +112,13 @@ col_high    = find_col(ic, ['high', 'fire', 'risk', 'exposure'])
 col_vhigh   = find_col(ic, ['very', 'high', 'fire', 'risk', 'exposure'])
 
 loss_cols = [c for c in ic.columns if 'fire' in c.lower() and 'incurred' in c.lower()]
+smoke_cols = [c for c in ic.columns if 'smoke' in c.lower() and 'incurred' in c.lower()]
 ic['total_fire_loss'] = ic[loss_cols].fillna(0).sum(axis=1)
+ic['total_smoke_loss'] = ic[smoke_cols].fillna(0).sum(axis=1)
+ic['total_insured_loss'] = ic['total_fire_loss'] + ic['total_smoke_loss']
 ic['premium_per_policy'] = ic[col_prem] / ic[col_exp].replace(0, np.nan)
-ic['loss_ratio'] = ic['total_fire_loss'] / ic[col_prem].replace(0, np.nan)
+ic['loss_ratio'] = ic['total_insured_loss'] / ic[col_prem].replace(0, np.nan)
+ic['smoke_share'] = ic['total_smoke_loss'] / ic['total_insured_loss'].replace(0, np.nan)
 ic['high_risk_frac'] = (
     (ic[col_high].fillna(0) + ic[col_vhigh].fillna(0)) / ic[col_exp].replace(0, np.nan)
 )
@@ -126,7 +130,8 @@ agg = ic.groupby('ZIP_Code').agg(
     avg_prem_pol   = ('premium_per_policy', 'mean'),
     avg_loss_ratio = ('loss_ratio',  'mean'),
     high_risk_frac = ('high_risk_frac', 'mean'),
-    total_fire_loss= ('total_fire_loss', 'sum'),
+    total_insured_loss= ('total_insured_loss', 'sum'),
+    smoke_share    = ('smoke_share', 'mean'),
 ).reset_index()
 
 pivot = ic.pivot_table(index='ZIP_Code', columns='Year', values=col_prem, aggfunc='mean')
@@ -200,9 +205,9 @@ reducer = umap.UMAP(n_components=2, n_neighbors=15, min_dist=0.1,
                     metric='euclidean', random_state=RANDOM_STATE)
 emb = reducer.fit_transform(X)
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plt.subplots(figsize=(10, 7))
 sc = ax.scatter(emb[:, 0], emb[:, 1], c=cdf['avg_fire_risk'],
-                cmap='YlOrRd', s=10, alpha=0.7)
+                cmap='YlOrRd', s=12, alpha=0.7)
 plt.colorbar(sc, ax=ax, label='Avg Fire Risk Score')
 ax.set(title='UMAP 2-D Projection (colored by fire risk)', xlabel='UMAP-1', ylabel='UMAP-2')
 plt.tight_layout()
@@ -269,17 +274,16 @@ for t in TIER_NAMES + ['Outlier']:
 # ═══════════════════════════════════════════════════════════════════════════════
 md("---\n## 8 — UMAP Scatter by Risk Tier")
 code("""\
-fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+fig, axes = plt.subplots(1, 2, figsize=(18, 7))
 
-# Left: micro-clusters
+# Left: micro-clusters (no legend — too many clusters for a usable legend)
 n_colors = len(set(micro) - {-1})
 palette = plt.cm.tab20(np.linspace(0, 1, max(n_colors, 1)))
 for cid in sorted(set(micro)):
     mask = micro == cid
     c = '#CCCCCC' if cid == -1 else palette[cid % len(palette)]
-    axes[0].scatter(emb[mask, 0], emb[mask, 1], c=[c], s=8, alpha=0.6,
-                    label=f'{cid}' if cid != -1 else 'noise')
-axes[0].set(title=f'Level-1: HDBSCAN Micro-Clusters (n={n_micro})',
+    axes[0].scatter(emb[mask, 0], emb[mask, 1], c=[c], s=10, alpha=0.6)
+axes[0].set(title=f'Level-1: HDBSCAN Micro-Clusters (n={n_micro}, noise={n_noise})',
             xlabel='UMAP-1', ylabel='UMAP-2')
 
 # Right: 5 macro tiers
@@ -301,10 +305,11 @@ plt.show()
 md("---\n## 9 — Risk Tier Profiles\n\nHeatmap of mean feature values per tier — enables quick comparison for judges and insurers.")
 code("""\
 profile_cols = ['avg_fire_risk', 'avg_premium', 'avg_prem_pol',
-                'avg_loss_ratio', 'high_risk_frac', 'pct_prem_chg']
+                'avg_loss_ratio', 'high_risk_frac', 'smoke_share', 'pct_prem_chg']
 display_names = {'avg_fire_risk': 'Fire Risk Score', 'avg_premium': 'Earned Premium ($)',
                  'avg_prem_pol': 'Premium / Policy ($)', 'avg_loss_ratio': 'Loss Ratio',
-                 'high_risk_frac': 'High-Risk Fraction', 'pct_prem_chg': 'Premium Change (%)'}
+                 'high_risk_frac': 'High-Risk Fraction', 'smoke_share': 'Smoke Share',
+                 'pct_prem_chg': 'Premium Change (%)'}
 
 prof = cdf.groupby('risk_tier')[profile_cols].mean()
 prof = prof.reindex([t for t in TIER_NAMES + ['Outlier'] if t in prof.index])
@@ -319,12 +324,13 @@ for c in norm.columns:
     rng = norm[c].max() - norm[c].min()
     norm[c] = (norm[c] - norm[c].min()) / (rng if rng > 0 else 1)
 
-fig, ax = plt.subplots(figsize=(10, 3.5))
+fig, ax = plt.subplots(figsize=(12, 4.5))
 sns.heatmap(norm.rename(columns=display_names).T,
-            annot=prof[profile_cols].rename(columns=display_names).T.round(2),
+            annot=prof[profile_cols].rename(columns=display_names).T.round(1),
             fmt='g', cmap='YlOrRd', linewidths=.5, ax=ax,
+            annot_kws={'size': 9},
             cbar_kws={'label': 'Normalized'})
-ax.set_title('Risk Tier Feature Profiles', fontsize=13)
+ax.set_title('Risk Tier Feature Profiles', fontsize=14)
 plt.tight_layout()
 plt.savefig('../results/tier_profiles_heatmap.png', dpi=150, bbox_inches='tight')
 plt.show()
@@ -431,7 +437,7 @@ if len(set(y_val)) > 1:
 else:
     print('Only one cluster — metrics not applicable')
 
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plt.subplots(figsize=(12, 7))
 for tier in TIER_NAMES:
     m = cdf['risk_tier'] == tier
     if m.any():
@@ -468,7 +474,8 @@ md("---\n## 14 — Export Cluster Labels")
 code("""\
 export_cols = ['ZIP_Code', 'county', 'lat', 'lon', 'tier_id', 'risk_tier',
                'micro', 'micro_prob', 'avg_fire_risk', 'avg_premium',
-               'avg_prem_pol', 'avg_loss_ratio', 'high_risk_frac', 'pct_prem_chg']
+               'avg_prem_pol', 'avg_loss_ratio', 'high_risk_frac', 'smoke_share',
+               'pct_prem_chg']
 out = cdf[[c for c in export_cols if c in cdf.columns]].copy()
 out.to_csv('../results/zip_cluster_labels.csv', index=False)
 

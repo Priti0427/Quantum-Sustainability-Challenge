@@ -1,0 +1,77 @@
+{
+  "training_window": "1984-2020",
+  "test_year": 2021,
+  "forward_validation": "2022-2024",
+  "train_rows": 13512,
+  "test_rows": 365,
+  "fwd_rows": 1090,
+  "models": {
+    "Logistic Regression": {
+      "F1": 0.7095028386480606,
+      "AUC-ROC": 0.7614101637764933,
+      "F1_fwd": 0.6622342668754515,
+      "AUC-ROC_fwd": 0.7699600027465925,
+      "Train Time (s)": 0.025,
+      "type": "classical"
+    },
+    "Random Forest": {
+      "F1": 0.6795792632318203,
+      "AUC-ROC": 0.7891076589595376,
+      "F1_fwd": 0.6641645988420182,
+      "AUC-ROC_fwd": 0.7705908607134274,
+      "Train Time (s)": 2.521,
+      "type": "classical"
+    },
+    "XGBoost": {
+      "F1": 0.7046925566343042,
+      "AUC-ROC": 0.7820327552986512,
+      "F1_fwd": 0.6669177932126644,
+      "AUC-ROC_fwd": 0.7525019741133655,
+      "Train Time (s)": 0.283,
+      "type": "classical"
+    },
+    "SVM (RBF)": {
+      "F1": 0.7383986299406258,
+      "AUC-ROC": 0.790101156069364,
+      "F1_fwd": 0.6585895943200237,
+      "AUC-ROC_fwd": 0.7672949497030248,
+      "Train Time (s)": 13.24,
+      "type": "classical"
+    },
+    "XGBoost (Tuned)": {
+      "F1": 0.7319204355299124,
+      "AUC-ROC": 0.8020532273603083,
+      "F1_fwd": 0.6747546132705142,
+      "AUC-ROC_fwd": 0.7803004943866517,
+      "Train Time (s)": 0.131,
+      "type": "classical"
+    },
+    "QRC (Quantum)": {
+      "F1": 0.7122942143548859,
+      "AUC-ROC": 0.7617714354527937,
+      "F1_fwd": 0.6239924371894363,
+      "AUC-ROC_fwd": 0.7645311909911766,
+      "Train Time (s)": 50.3,
+      "type": "quantum",
+      "qubits": 8
+    },
+    "Trainable Kernel (Quantum)": {
+      "F1": 0.565936337329475,
+      "AUC-ROC": 0.0,
+      "F1_fwd": 0.0,
+      "AUC-ROC_fwd": 0.0,
+      "Train Time (s)": 2661.4,
+      "type": "quantum",
+      "qubits": 6
+    },
+    "Transfer Learning (Hybrid)": {
+      "F1": 0.6552855679344346,
+      "AUC-ROC": 0.748103323699422,
+      "F1_fwd": 0.0,
+      "AUC-ROC_fwd": 0.0,
+      "Train Time (s)": 0.5,
+      "type": "hybrid",
+      "qubits": 4
+    }
+  }
+}

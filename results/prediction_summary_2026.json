@@ -1,45 +1,45 @@
 {
   "total_zips": 2174,
   "tier_distribution": {
-    "Negligible": 1440,
-    "Extreme": 731,
-    "Low": 2,
-    "High": 1,
+    "Negligible": 1766,
+    "Extreme": 318,
+    "Low": 60,
+    "High": 30,
     "Moderate": 0
   },
-  "mean_confidence": 0.997,
+  "mean_confidence": 0.979,
   "top_5_risk_zips": [
     {
-      "ZIP_Code": 95485,
-      "county": "Sonoma County",
-      "risk_score_2026": 1.0
+      "ZIP_Code": 96010,
+      "county": "Lassen County",
+      "risk_score_2026": 0.999836472427854
     },
     {
-      "ZIP_Code": 95425,
-      "county": "Sonoma County",
-      "risk_score_2026": 1.0
-    },
-    {
-      "ZIP_Code": 91321,
-      "county": "Los Angeles County",
-      "risk_score_2026": 1.0
-    },
-    {
-      "ZIP_Code": 91320,
-      "county": "Los Angeles County",
-      "risk_score_2026": 1.0
-    },
-    {
-      "ZIP_Code": 95979,
+      "ZIP_Code": 95923,
       "county": "Butte County",
-      "risk_score_2026": 1.0
+      "risk_score_2026": 0.9987497990769455
+    },
+    {
+      "ZIP_Code": 95934,
+      "county": "Butte County",
+      "risk_score_2026": 0.9960349014873113
+    },
+    {
+      "ZIP_Code": 96001,
+      "county": "Lassen County",
+      "risk_score_2026": 0.9952956827628707
+    },
+    {
+      "ZIP_Code": 96039,
+      "county": "Lassen County",
+      "risk_score_2026": 0.9938354768273221
     }
   ],
   "top_5_risk_counties": {
-    "Shasta County": 0.9621892154091908,
-    "Lassen County": 0.8845716114880326,
-    "Humboldt County": 0.8599415501186763,
-    "Sonoma County": 0.8187788614368443,
-    "Marin County": 0.6926400924459795
+    "Lassen County": 0.8056327586056551,
+    "Butte County": 0.7606729515674399,
+    "Shasta County": 0.7055835092321697,
+    "Sonoma County": 0.5465629126000345,
+    "Humboldt County": 0.44237367490487994
   }
 }

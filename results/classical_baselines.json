@@ -2,21 +2,21 @@
   "Logistic Regression": {
     "F1": 0.672566371681416,
     "AUC-ROC": 0.7596640173410404,
-    "Train Time (s)": 0.04
+    "Train Time (s)": 0.054
   },
   "Random Forest": {
     "F1": 0.6504559270516718,
     "AUC-ROC": 0.7733772880539499,
-    "Train Time (s)": 0.769
+    "Train Time (s)": 0.257
   },
   "XGBoost": {
     "F1": 0.6465256797583081,
     "AUC-ROC": 0.7582490366088631,
-    "Train Time (s)": 1.355
+    "Train Time (s)": 0.284
   },
   "SVM (RBF)": {
     "F1": 0.7089337175792507,
     "AUC-ROC": 0.7592425337186897,
-    "Train Time (s)": 0.275
+    "Train Time (s)": 0.071
   }
 }

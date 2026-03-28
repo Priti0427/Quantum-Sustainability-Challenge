@@ -56,6 +56,10 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 import xgboost as xgb
 
+import optuna
+optuna.logging.set_verbosity(optuna.logging.WARNING)
+import shap
+
 sns.set_theme(style='whitegrid')
 plt.rcParams.update({'figure.dpi': 150})
 SEED = 42
@@ -155,11 +159,14 @@ col_prem = find_col(ins, ['earned', 'premium'])
 col_exp  = find_col(ins, ['earned', 'exposure'])
 col_risk = find_col(ins, ['fire', 'risk', 'score'])
 loss_cols = [c for c in ins.columns if 'fire' in c.lower() and 'incurred' in c.lower()]
+smoke_cols = [c for c in ins.columns if 'smoke' in c.lower() and 'incurred' in c.lower()]
 ins['total_fire_loss'] = ins[loss_cols].fillna(0).sum(axis=1)
+ins['total_smoke_loss'] = ins[smoke_cols].fillna(0).sum(axis=1)
+ins['total_insured_loss'] = ins['total_fire_loss'] + ins['total_smoke_loss']
 ins['prem_per_pol'] = ins[col_prem] / ins[col_exp].replace(0, np.nan)
-ins['loss_ratio'] = ins['total_fire_loss'] / ins[col_prem].replace(0, np.nan)
+ins['loss_ratio'] = ins['total_insured_loss'] / ins[col_prem].replace(0, np.nan)
 
-T2_FEATURES = [col_risk, col_prem, col_exp, 'total_fire_loss', 'prem_per_pol', 'loss_ratio']
+T2_FEATURES = [col_risk, col_exp, 'total_insured_loss']
 ins2_clean = ins.dropna(subset=T2_FEATURES + ['Year']).copy()
 
 # Create next-year premium as target
@@ -390,8 +397,8 @@ print(f'Trainable Kernel: {n_kernel_qubits} qubits, {2*n_kernel_qubits} trainabl
 
 code("""\
 # Use small subset for kernel training (kernel matrix is O(n^2))
-N_KERNEL = min(120, len(X1_tr_q)) if not CLOUD_MODE else min(300, len(X1_tr_q))
-N_KERNEL_TE = min(60, len(X1_te_q))
+N_KERNEL = min(60, len(X1_tr_q)) if not CLOUD_MODE else min(300, len(X1_tr_q))
+N_KERNEL_TE = min(30, len(X1_te_q))
 
 X_k_tr = pnp.array(X1_tr_q[:N_KERNEL, :n_kernel_qubits], requires_grad=False)
 y_k_tr = y1_tr[:N_KERNEL].copy()
@@ -403,7 +410,7 @@ y_k_te = y1_te[:N_KERNEL_TE]
 params_k = pnp.array(np.random.uniform(0.5, 1.5, 2 * n_kernel_qubits), requires_grad=True)
 
 opt_k = qml.AdamOptimizer(stepsize=0.1)
-n_kernel_epochs = 15 if not CLOUD_MODE else 30
+n_kernel_epochs = 8 if not CLOUD_MODE else 30
 
 print(f'Training quantum kernel ({N_KERNEL} samples, {n_kernel_epochs} epochs)...')
 t0 = time.time()
@@ -989,6 +996,241 @@ print(f'  {"-"*65}')
 print(f'  {"Classical LSTM":<25s} {"Classical":<12s} {r2_clstm:>8.4f} {rmse_clstm:>8.4f} {"—":>8s}')
 print(f'  {"Temporal XGBoost":<25s} {"Classical":<12s} {r2_xgb_ts:>8.4f} {rmse_xgb_ts:>8.4f} {"—":>8s}')
 print(f'  {"QLSTM (4 qubits)":<25s} {"Quantum":<12s} {r2_qlstm:>8.4f} {rmse_qlstm:>8.4f} {n_qlstm_qubits:>8d}')
+""")
+
+md("""\
+---
+# Section H — Optuna Hyperparameter Tuning
+
+We use Optuna to automatically find the best hyperparameters for the classical models that
+are compared against quantum models. This ensures the classical baselines are as strong as
+possible — making any quantum advantage claim more credible.
+
+**Models tuned (50 trials, 3-fold CV each):**
+1. XGBoost (Task 1A classification) — objective: F1
+2. XGBoost (Task 2 regression) — objective: R2
+3. QRC + LogisticRegression head (Task 1A) — objective: F1
+4. QRC + Ridge head (Task 2) — objective: R2
+""")
+
+code("""\
+from sklearn.model_selection import cross_val_score
+
+# ── 1. Optuna: XGBoost Task 1A ──────────────────────────────────────────────
+def xgb_1a_objective(trial):
+    params = {
+        'n_estimators': trial.suggest_int('n_estimators', 50, 500),
+        'max_depth': trial.suggest_int('max_depth', 2, 10),
+        'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3, log=True),
+        'subsample': trial.suggest_float('subsample', 0.5, 1.0),
+        'colsample_bytree': trial.suggest_float('colsample_bytree', 0.5, 1.0),
+        'min_child_weight': trial.suggest_int('min_child_weight', 1, 10),
+    }
+    clf = xgb.XGBClassifier(**params, use_label_encoder=False,
+                             eval_metric='logloss', random_state=SEED)
+    scores = cross_val_score(clf, X1_tr_s[:N_TRAIN_1A], y1_tr[:N_TRAIN_1A],
+                             cv=3, scoring='f1')
+    return scores.mean()
+
+print('Optuna: tuning XGBoost (Task 1A, 50 trials)...')
+t0 = time.time()
+study_xgb_1a = optuna.create_study(direction='maximize',
+                                    sampler=optuna.samplers.TPESampler(seed=SEED))
+study_xgb_1a.optimize(xgb_1a_objective, n_trials=50, show_progress_bar=False)
+print(f'  Best F1 (CV): {study_xgb_1a.best_value:.4f}  |  {time.time()-t0:.1f}s')
+print(f'  Best params: {study_xgb_1a.best_params}')
+
+clf_xgb_tuned = xgb.XGBClassifier(**study_xgb_1a.best_params, use_label_encoder=False,
+                                    eval_metric='logloss', random_state=SEED)
+clf_xgb_tuned.fit(X1_tr_s[:N_TRAIN_1A], y1_tr[:N_TRAIN_1A])
+y_xgb_tuned_1a = clf_xgb_tuned.predict(X1_te_s[:N_TEST_1A])
+f1_xgb_tuned = f1_score(y1_te[:N_TEST_1A], y_xgb_tuned_1a)
+print(f'  Tuned XGBoost F1 (test): {f1_xgb_tuned:.4f}  (was {f1_xgb:.4f})')
+
+# ── 2. Optuna: XGBoost Task 2 ───────────────────────────────────────────────
+def xgb_t2_objective(trial):
+    params = {
+        'n_estimators': trial.suggest_int('n_estimators', 50, 500),
+        'max_depth': trial.suggest_int('max_depth', 2, 10),
+        'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3, log=True),
+        'subsample': trial.suggest_float('subsample', 0.5, 1.0),
+        'colsample_bytree': trial.suggest_float('colsample_bytree', 0.5, 1.0),
+    }
+    reg = xgb.XGBRegressor(**params, random_state=SEED)
+    scores = cross_val_score(reg, X2_tr_s[:N_TRAIN_2], y2_tr[:N_TRAIN_2],
+                             cv=3, scoring='r2')
+    return scores.mean()
+
+print('\\nOptuna: tuning XGBoost (Task 2, 50 trials)...')
+t0 = time.time()
+study_xgb_t2 = optuna.create_study(direction='maximize',
+                                    sampler=optuna.samplers.TPESampler(seed=SEED))
+study_xgb_t2.optimize(xgb_t2_objective, n_trials=50, show_progress_bar=False)
+print(f'  Best R2 (CV): {study_xgb_t2.best_value:.4f}  |  {time.time()-t0:.1f}s')
+print(f'  Best params: {study_xgb_t2.best_params}')
+
+reg_xgb_tuned = xgb.XGBRegressor(**study_xgb_t2.best_params, random_state=SEED)
+reg_xgb_tuned.fit(X2_tr_s[:N_TRAIN_2], y2_tr[:N_TRAIN_2])
+y_xgb_tuned_t2 = reg_xgb_tuned.predict(X2_te_s[:N_TEST_2])
+r2_xgb_tuned = r2_score(y2_te[:N_TEST_2], y_xgb_tuned_t2)
+print(f'  Tuned XGBoost R2 (test): {r2_xgb_tuned:.4f}  (was {r2_lr2:.4f} Ridge)')
+
+# ── 3. Optuna: QRC + LogReg head (Task 1A) ──────────────────────────────────
+def qrc_lr_objective(trial):
+    C = trial.suggest_float('C', 0.001, 100.0, log=True)
+    solver = trial.suggest_categorical('solver', ['lbfgs', 'liblinear', 'saga'])
+    clf = LogisticRegression(C=C, solver=solver, max_iter=2000,
+                             class_weight='balanced', random_state=SEED)
+    scores = cross_val_score(clf, qrc_feat_tr_1, y1_tr_sub,
+                             cv=3, scoring='f1')
+    return scores.mean()
+
+print('\\nOptuna: tuning QRC + LogReg head (Task 1A, 50 trials)...')
+t0 = time.time()
+study_qrc_lr = optuna.create_study(direction='maximize',
+                                    sampler=optuna.samplers.TPESampler(seed=SEED))
+study_qrc_lr.optimize(qrc_lr_objective, n_trials=50, show_progress_bar=False)
+print(f'  Best F1 (CV): {study_qrc_lr.best_value:.4f}  |  {time.time()-t0:.1f}s')
+
+clf_qrc_tuned = LogisticRegression(
+    C=study_qrc_lr.best_params['C'],
+    solver=study_qrc_lr.best_params['solver'],
+    max_iter=2000, class_weight='balanced', random_state=SEED)
+clf_qrc_tuned.fit(qrc_feat_tr_1, y1_tr_sub)
+y_qrc_tuned_1a = clf_qrc_tuned.predict(qrc_feat_te_1)
+f1_qrc_tuned = f1_score(y1_te_sub, y_qrc_tuned_1a)
+print(f'  Tuned QRC+LogReg F1 (test): {f1_qrc_tuned:.4f}  (was {f1_qrc:.4f})')
+
+# ── 4. Optuna: QRC + Ridge head (Task 2) ────────────────────────────────────
+def qrc_ridge_objective(trial):
+    alpha = trial.suggest_float('alpha', 0.001, 1000.0, log=True)
+    reg = Ridge(alpha=alpha, random_state=SEED)
+    scores = cross_val_score(reg, qrc_feat_tr_2, y2_tr_sub,
+                             cv=3, scoring='r2')
+    return scores.mean()
+
+print('\\nOptuna: tuning QRC + Ridge head (Task 2, 50 trials)...')
+t0 = time.time()
+study_qrc_ridge = optuna.create_study(direction='maximize',
+                                       sampler=optuna.samplers.TPESampler(seed=SEED))
+study_qrc_ridge.optimize(qrc_ridge_objective, n_trials=50, show_progress_bar=False)
+print(f'  Best R2 (CV): {study_qrc_ridge.best_value:.4f}  |  {time.time()-t0:.1f}s')
+
+reg_qrc_tuned = Ridge(alpha=study_qrc_ridge.best_params['alpha'], random_state=SEED)
+reg_qrc_tuned.fit(qrc_feat_tr_2, y2_tr_sub)
+y_qrc_tuned_t2 = reg_qrc_tuned.predict(qrc_feat_te_2)
+r2_qrc_tuned = r2_score(y2_te_sub, y_qrc_tuned_t2)
+print(f'  Tuned QRC+Ridge R2 (test): {r2_qrc_tuned:.4f}  (was {r2_qrc:.4f})')
+
+print('\\n=== OPTUNA SUMMARY ===')
+print(f'  XGBoost Task 1A:   F1  {f1_xgb:.4f} -> {f1_xgb_tuned:.4f}')
+print(f'  XGBoost Task 2:    R2  {r2_lr2:.4f} -> {r2_xgb_tuned:.4f}')
+print(f'  QRC+LogReg Task1A: F1  {f1_qrc:.4f} -> {f1_qrc_tuned:.4f}')
+print(f'  QRC+Ridge Task 2:  R2  {r2_qrc:.4f} -> {r2_qrc_tuned:.4f}')
+""")
+
+md("""\
+---
+# Section I — SHAP Explainability
+
+SHAP (SHapley Additive exPlanations) reveals **which features** drive each prediction and by
+how much. We apply it to both the classical XGBoost models and the QRC quantum heads, providing
+interpretable explanations for quantum-enhanced predictions.
+""")
+
+code("""\
+# ── SHAP: XGBoost Task 1A (Classification) ──────────────────────────────────
+feature_names_1a = ['PRECIPITATION', 'MAX_TEMP', 'MIN_TEMP', 'AVG_WIND_SPEED',
+                    'TEMP_RANGE', 'WIND_TEMP_RATIO', 'MONTH', 'DAY_OF_YEAR',
+                    'LAGGED_PRECIP', 'LAGGED_WIND']
+X_shap_1a = pd.DataFrame(X1_te_s[:N_TEST_1A],
+                          columns=feature_names_1a[:X1_te_s.shape[1]])
+
+explainer_xgb_1a = shap.TreeExplainer(clf_xgb_tuned)
+shap_values_xgb_1a = explainer_xgb_1a(X_shap_1a)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+shap.plots.beeswarm(shap_values_xgb_1a, show=False, max_display=12)
+plt.title('SHAP — XGBoost Task 1A: What Drives Wildfire Prediction?', fontsize=12, pad=15)
+plt.tight_layout()
+plt.savefig('../results/shap_xgb_task1a.png', dpi=150, bbox_inches='tight')
+plt.show()
+print('Saved: results/shap_xgb_task1a.png')
+
+# ── SHAP: XGBoost Task 2 (Regression) ───────────────────────────────────────
+T2_FEAT_NAMES = ['Avg_Fire_Risk', 'Exposure', 'Total_Insured_Loss']
+X_shap_t2 = pd.DataFrame(X2_te_s[:N_TEST_2],
+                          columns=T2_FEAT_NAMES[:X2_te_s.shape[1]])
+
+explainer_xgb_t2 = shap.TreeExplainer(reg_xgb_tuned)
+shap_values_xgb_t2 = explainer_xgb_t2(X_shap_t2)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+shap.plots.beeswarm(shap_values_xgb_t2, show=False, max_display=10)
+plt.title('SHAP — XGBoost Task 2: What Drives Premium Prediction?', fontsize=12, pad=15)
+plt.tight_layout()
+plt.savefig('../results/shap_xgb_task2.png', dpi=150, bbox_inches='tight')
+plt.show()
+print('Saved: results/shap_xgb_task2.png')
+
+# ── SHAP: QRC + LogReg Head (Task 1A) ───────────────────────────────────────
+qrc_feat_names = [f'QRC_{i}' for i in range(qrc_feat_te_1.shape[1])]
+X_shap_qrc_1a = pd.DataFrame(qrc_feat_te_1, columns=qrc_feat_names)
+
+explainer_qrc_1a = shap.LinearExplainer(clf_qrc_tuned,
+                                         pd.DataFrame(qrc_feat_tr_1, columns=qrc_feat_names))
+shap_values_qrc_1a = explainer_qrc_1a(X_shap_qrc_1a)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+shap.plots.beeswarm(shap_values_qrc_1a, show=False)
+plt.title('SHAP — QRC Quantum Features (Task 1A): Which Reservoir Outputs Matter?',
+          fontsize=11, pad=15)
+plt.tight_layout()
+plt.savefig('../results/shap_qrc_task1a.png', dpi=150, bbox_inches='tight')
+plt.show()
+print('Saved: results/shap_qrc_task1a.png')
+
+# ── SHAP: QRC + Ridge Head (Task 2) ─────────────────────────────────────────
+X_shap_qrc_t2 = pd.DataFrame(qrc_feat_te_2, columns=qrc_feat_names)
+
+explainer_qrc_t2 = shap.LinearExplainer(reg_qrc_tuned,
+                                          pd.DataFrame(qrc_feat_tr_2, columns=qrc_feat_names))
+shap_values_qrc_t2 = explainer_qrc_t2(X_shap_qrc_t2)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+shap.plots.beeswarm(shap_values_qrc_t2, show=False)
+plt.title('SHAP — QRC Quantum Features (Task 2): Which Reservoir Outputs Matter?',
+          fontsize=11, pad=15)
+plt.tight_layout()
+plt.savefig('../results/shap_qrc_task2.png', dpi=150, bbox_inches='tight')
+plt.show()
+print('Saved: results/shap_qrc_task2.png')
+
+# ── Combined 2x2 SHAP summary ───────────────────────────────────────────────
+fig, axes = plt.subplots(2, 2, figsize=(18, 14))
+
+plt.sca(axes[0, 0])
+shap.plots.beeswarm(shap_values_xgb_1a, show=False, max_display=8)
+axes[0, 0].set_title('XGBoost — Task 1A (Wildfire)', fontsize=11)
+
+plt.sca(axes[0, 1])
+shap.plots.beeswarm(shap_values_xgb_t2, show=False, max_display=8)
+axes[0, 1].set_title('XGBoost — Task 2 (Premium)', fontsize=11)
+
+plt.sca(axes[1, 0])
+shap.plots.beeswarm(shap_values_qrc_1a, show=False)
+axes[1, 0].set_title('QRC Quantum Head — Task 1A', fontsize=11)
+
+plt.sca(axes[1, 1])
+shap.plots.beeswarm(shap_values_qrc_t2, show=False)
+axes[1, 1].set_title('QRC Quantum Head — Task 2', fontsize=11)
+
+plt.suptitle('SHAP Explainability Summary — Classical vs Quantum Features',
+             fontsize=14, y=1.01)
+plt.tight_layout()
+plt.savefig('../results/shap_nb05_summary.png', dpi=150, bbox_inches='tight')
+plt.show()
+print('Saved: results/shap_nb05_summary.png')
 """)
 
 md("""\
