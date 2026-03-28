@@ -31,3 +31,10 @@ venv/
 # Large original dataset filenames (duplicates — clean copies are in data/)
 aZ7w*.csv
 aZ7w*.XLS
+
+# Temp/scratch files
+_gen_09.py
+_gen_09_updated.py
+QUANTUM_ML_ALGORITHM_RESEARCH_REPORT.md
+notebooks/NB09_updated.ipynb
+results/ram_qrsre_updated_*
