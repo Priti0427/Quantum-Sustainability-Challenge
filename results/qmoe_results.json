@@ -1,0 +1,139 @@
+{
+  "algorithm": "Q-MoE Fire (Quantum Mixture-of-Experts)",
+  "notebook": "14_QMoE_Fire.ipynb",
+  "quantum": {
+    "qubits": 4,
+    "n_experts": 4,
+    "reservoir_layers": 10,
+    "topologies": [
+      "ring",
+      "ladder",
+      "star",
+      "full"
+    ],
+    "observables_per_expert": 11
+  },
+  "regimes": {
+    "A": 24,
+    "B": 13,
+    "C": 17,
+    "D": 4
+  },
+  "classification": {
+    "Q-MoE Hard Gate + LogReg": {
+      "F1": 0.4325,
+      "AUC": 0.6993
+    },
+    "Q-MoE Hard Gate + GBM": {
+      "F1": 0.5219,
+      "AUC": 0.8201
+    },
+    "Q-MoE Soft Gate + LogReg": {
+      "F1": 0.4106,
+      "AUC": 0.6935
+    },
+    "Q-MoE Soft Gate + GBM": {
+      "F1": 0.5388,
+      "AUC": 0.8088
+    },
+    "Q-MoE Concat All + LogReg": {
+      "F1": 0.5745,
+      "AUC": 0.8623
+    },
+    "Q-MoE Concat All + GBM": {
+      "F1": 0.7817,
+      "AUC": 0.9338
+    },
+    "Single Expert (baseline) + LogReg": {
+      "F1": 0.4102,
+      "AUC": 0.68
+    },
+    "Single Expert (baseline) + GBM": {
+      "F1": 0.6911,
+      "AUC": 0.8858
+    }
+  },
+  "regression": {
+    "Q-MoE Hard Gate + Ridge": {
+      "R2": 0.0596,
+      "RMSE": 2.5229
+    },
+    "Q-MoE Hard Gate + GBM": {
+      "R2": 0.2383,
+      "RMSE": 2.2706
+    },
+    "Q-MoE Soft Gate + Ridge": {
+      "R2": 0.0805,
+      "RMSE": 2.4948
+    },
+    "Q-MoE Soft Gate + GBM": {
+      "R2": 0.3048,
+      "RMSE": 2.1692
+    },
+    "Q-MoE Concat All + Ridge": {
+      "R2": 0.3652,
+      "RMSE": 2.0729
+    },
+    "Q-MoE Concat All + GBM": {
+      "R2": 0.535,
+      "RMSE": 1.7742
+    },
+    "Single Expert (baseline) + Ridge": {
+      "R2": 0.0691,
+      "RMSE": 2.5102
+    },
+    "Single Expert (baseline) + GBM": {
+      "R2": 0.4433,
+      "RMSE": 1.9412
+    }
+  },
+  "per_regime_ablation": [
+    {
+      "Regime": "A",
+      "N_test": 570,
+      "Fire_rate": 0.07368421052631578,
+      "MoE_F1": 0.6933,
+      "Base_F1": 0.5823,
+      "F1_lift": 0.1111,
+      "MoE_R2": 0.4197,
+      "Base_R2": 0.387,
+      "R2_lift": 0.0327
+    },
+    {
+      "Regime": "B",
+      "N_test": 308,
+      "Fire_rate": 0.41883116883116883,
+      "MoE_F1": 0.8333,
+      "Base_F1": 0.7358,
+      "F1_lift": 0.0975,
+      "MoE_R2": 0.5893,
+      "Base_R2": 0.4064,
+      "R2_lift": 0.1829
+    },
+    {
+      "Regime": "C",
+      "N_test": 402,
+      "Fire_rate": 0.22885572139303484,
+      "MoE_F1": 0.7389,
+      "Base_F1": 0.6797,
+      "F1_lift": 0.0591,
+      "MoE_R2": 0.4697,
+      "Base_R2": 0.4341,
+      "R2_lift": 0.0356
+    },
+    {
+      "Regime": "D",
+      "N_test": 94,
+      "Fire_rate": 0.24468085106382978,
+      "MoE_F1": 0.8182,
+      "Base_F1": 0.7083,
+      "F1_lift": 0.1098,
+      "MoE_R2": 0.4214,
+      "Base_R2": 0.2631,
+      "R2_lift": 0.1583
+    }
+  ],
+  "timings": {
+    "all_experts_encoding": 398.91
+  }
+}

@@ -1,0 +1,5 @@
+Component,Qubits,Circuit Depth,Quantum Params,Classical Params,Purpose
+Reservoir Bank (x3),4,4 / 6 / 8,0 (all fixed),0,Non-linear feature extraction
+Cross-Attention Fusion,4,6 (3 re-uploads x 2 layers),48,491,Adaptive timescale weighting
+Task 1A Head,4,1 (re-uploading),12,shared w/ attention,Wildfire classification
+Task 2 Head,4,1 (re-uploading),12,shared w/ attention,Premium regression

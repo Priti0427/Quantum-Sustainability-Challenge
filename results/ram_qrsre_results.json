@@ -1,0 +1,170 @@
+{
+  "task_1a": {
+    "linear_head": {
+      "f1": 0.7804878048780488,
+      "auc": 0.8109042823720882
+    },
+    "ram_qrsre": {
+      "f1": 0.7830188679245284,
+      "auc": 0.8084630251246059,
+      "threshold": 0.4375
+    },
+    "expert_history": [
+      {
+        "regime": 0,
+        "train_samples": 100,
+        "test_samples": 166,
+        "status": "trained",
+        "residual_bias": 0.0,
+        "history": [
+          {
+            "layers": 1,
+            "final_loss": 0.8411861062049866
+          },
+          {
+            "layers": 2,
+            "final_loss": 1.3392972707748414
+          }
+        ]
+      },
+      {
+        "regime": 1,
+        "train_samples": 100,
+        "test_samples": 34,
+        "status": "trained",
+        "residual_bias": 0.0,
+        "history": [
+          {
+            "layers": 1,
+            "final_loss": 0.5795241236686707
+          },
+          {
+            "layers": 2,
+            "final_loss": 0.5751473426818847
+          }
+        ]
+      },
+      {
+        "regime": 2,
+        "train_samples": 100,
+        "test_samples": 0,
+        "status": "trained",
+        "residual_bias": 0.0,
+        "history": [
+          {
+            "layers": 1,
+            "final_loss": 0.8460591793060303
+          },
+          {
+            "layers": 2,
+            "final_loss": 0.8194795966148376
+          }
+        ]
+      }
+    ],
+    "regime_edges": [
+      -Infinity,
+      69.13293519132937,
+      73.85512989872302,
+      Infinity
+    ]
+  },
+  "task_2": {
+    "linear_head": {
+      "r2": 0.07275128364562988,
+      "rmse": 1.9866541592099705
+    },
+    "ram_qrsre": {
+      "r2": 0.08740558073937554,
+      "rmse": 1.970892995138488
+    },
+    "expert_history": [
+      {
+        "regime": 0,
+        "train_samples": 53,
+        "test_samples": 15,
+        "status": "trained",
+        "residual_bias": 0.09660656005144119,
+        "history": [
+          {
+            "layers": 1,
+            "final_loss": 0.4073970715204875
+          },
+          {
+            "layers": 2,
+            "final_loss": 0.5025503138701121
+          }
+        ]
+      },
+      {
+        "regime": 1,
+        "train_samples": 52,
+        "test_samples": 38,
+        "status": "trained",
+        "residual_bias": -0.040861256420612335,
+        "history": [
+          {
+            "layers": 1,
+            "final_loss": 0.33133813738822937
+          },
+          {
+            "layers": 2,
+            "final_loss": 0.3839202920595805
+          }
+        ]
+      },
+      {
+        "regime": 2,
+        "train_samples": 55,
+        "test_samples": 147,
+        "status": "trained",
+        "residual_bias": -0.05446140840649605,
+        "history": [
+          {
+            "layers": 1,
+            "final_loss": 0.637771318356196
+          },
+          {
+            "layers": 2,
+            "final_loss": 0.5606041749318441
+          }
+        ]
+      }
+    ],
+    "regime_edges": [
+      -Infinity,
+      0.18,
+      0.38,
+      Infinity
+    ]
+  },
+  "config": {
+    "reservoir_qubits": 4,
+    "reservoirs": [
+      {
+        "name": "short",
+        "depth": 4,
+        "pattern": "ring",
+        "seed": 53
+      },
+      {
+        "name": "seasonal",
+        "depth": 6,
+        "pattern": "ladder",
+        "seed": 65
+      },
+      {
+        "name": "trend",
+        "depth": 8,
+        "pattern": "star",
+        "seed": 79
+      }
+    ],
+    "head_layer_schedule": [
+      1,
+      2
+    ],
+    "projected_local_observables_per_reservoir": 12,
+    "n_regimes": 3
+  }
+}

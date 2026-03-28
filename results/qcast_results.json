@@ -1,0 +1,91 @@
+{
+  "algorithm": "Q-CAST (Quantum Causal Scenario Transformer)",
+  "notebook": "15_QCAST_Scenario_Transformer.ipynb",
+  "quantum": {
+    "qubits": 4,
+    "reservoir_layers": 10
+  },
+  "baseline": {
+    "f1": 0.6911,
+    "auc": 0.8858,
+    "r2": 0.4433
+  },
+  "scenarios": {
+    "Baseline": {
+      "fire_rate": 0.1499,
+      "mean_probability": 0.1803,
+      "mean_severity": 1.0032,
+      "flipped_to_fire": 0,
+      "flipped_to_safe": 0,
+      "severity_delta": 0.0,
+      "prob_delta": 0.0,
+      "conformal_interval_width": 3.8097
+    },
+    "Drought": {
+      "fire_rate": 0.1608,
+      "mean_probability": 0.1891,
+      "mean_severity": 1.0234,
+      "flipped_to_fire": 35,
+      "flipped_to_safe": 20,
+      "severity_delta": 0.0202,
+      "prob_delta": 0.0088,
+      "conformal_interval_width": 3.8097
+    },
+    "Extreme Wind": {
+      "fire_rate": 0.1361,
+      "mean_probability": 0.1705,
+      "mean_severity": 0.946,
+      "flipped_to_fire": 24,
+      "flipped_to_safe": 43,
+      "severity_delta": -0.0572,
+      "prob_delta": -0.0098,
+      "conformal_interval_width": 3.8097
+    },
+    "Compound Crisis": {
+      "fire_rate": 0.1441,
+      "mean_probability": 0.1771,
+      "mean_severity": 0.978,
+      "flipped_to_fire": 31,
+      "flipped_to_safe": 39,
+      "severity_delta": -0.0252,
+      "prob_delta": -0.0032,
+      "conformal_interval_width": 3.8097
+    },
+    "Mitigation (Burns)": {
+      "fire_rate": 0.147,
+      "mean_probability": 0.178,
+      "mean_severity": 0.9964,
+      "flipped_to_fire": 5,
+      "flipped_to_safe": 9,
+      "severity_delta": -0.0068,
+      "prob_delta": -0.0023,
+      "conformal_interval_width": 3.8097
+    },
+    "Wet Year": {
+      "fire_rate": 0.1419,
+      "mean_probability": 0.1774,
+      "mean_severity": 0.9842,
+      "flipped_to_fire": 10,
+      "flipped_to_safe": 21,
+      "severity_delta": -0.019,
+      "prob_delta": -0.0029,
+      "conformal_interval_width": 3.8097
+    }
+  },
+  "conformal_q90": 1.9049,
+  "county_impact_worst_case": {
+    "scenario": "Compound Crisis",
+    "n_worsened": 17,
+    "n_stable": 18,
+    "n_improved": 23
+  },
+  "timings": {
+    "baseline_encoding": 93.79,
+    "scenario_Baseline": 0.01,
+    "scenario_Drought": 96.23,
+    "scenario_Extreme Wind": 94.93,
+    "scenario_Compound Crisis": 93.17,
+    "scenario_Mitigation (Burns)": 93.07,
+    "scenario_Wet Year": 90.31
+  }
+}

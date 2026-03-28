@@ -1,0 +1,51 @@
+{
+  "algorithm": "Multi-Task Quantum Temporal Fusion (MQTF)",
+  "notebook": "13_MultiTask_Quantum_Temporal_Fusion.ipynb",
+  "quantum": {
+    "qubits": 4,
+    "reservoir_layers": 10,
+    "observables": 11
+  },
+  "multi_task_lambda": 0.5,
+  "single_task": {
+    "fire_cls": {
+      "F1": 0.4102,
+      "AUC": 0.68
+    },
+    "fire_reg": {
+      "R2": 0.0691,
+      "RMSE": 2.5102
+    },
+    "premium_reg": {
+      "R2": -1.2369,
+      "RMSE": 0.1592
+    }
+  },
+  "multi_task": {
+    "fire_cls": {
+      "F1": 0.6931,
+      "AUC": 0.8927
+    },
+    "fire_reg": {
+      "R2": 0.4748,
+      "RMSE": 1.8854
+    },
+    "premium_reg": {
+      "R2": -1.296,
+      "RMSE": 0.1613
+    }
+  },
+  "conformal": {
+    "alpha": 0.1,
+    "cls_coverage": 0.8843,
+    "acre_coverage": 0.8595,
+    "prem_coverage": 0.4942
+  },
+  "timings": {
+    "reservoir_encoding": 95.57,
+    "single_cls": 0.17,
+    "single_reg_acre": 0.0,
+    "single_reg_prem": 0.0,
+    "multitask_train": 3.64
+  }
+}

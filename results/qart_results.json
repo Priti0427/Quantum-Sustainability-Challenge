@@ -1,0 +1,116 @@
+{
+  "algorithm": "QART \u2014 Quantum Adaptive Reservoir Transformer (reverted to best config)",
+  "task_1a": {
+    "best_approach": "attn_LogReg_C0.1",
+    "f1": 0.7545454545454545,
+    "auc": 0.7521106703285525,
+    "threshold": 0.4,
+    "all_approaches": {
+      "quantum_head": {
+        "f1": 0.6923076923076923,
+        "auc": 0.7529244227443801
+      },
+      "attn_LogReg_C0.1": {
+        "f1": 0.7545454545454545,
+        "auc": 0.7521106703285525
+      },
+      "attn_LogReg_C1.0": {
+        "f1": 0.6326530612244898,
+        "auc": 0.7522123893805309
+      },
+      "attn_LogReg_C10.0": {
+        "f1": 0.5824175824175825,
+        "auc": 0.7546536466280134
+      },
+      "attn_SVM_RBF": {
+        "f1": 0.6956521739130435,
+        "auc": 0.7582646729732478
+      }
+    },
+    "training_time_s": 173.45969676971436
+  },
+  "task_2": {
+    "best_approach": "attn_Ridge",
+    "r2": 0.2793200612068176,
+    "rmse": 1.75144047716184,
+    "all_approaches": {
+      "quantum_head": {
+        "r2": 0.15535306930541992,
+        "rmse": 1.8961022853462735
+      },
+      "attn_Ridge": {
+        "r2": 0.2793200612068176,
+        "rmse": 1.75144047716184
+      },
+      "attn_GBM_50": {
+        "r2": 0.05070561649128236,
+        "rmse": 2.010132092635529
+      },
+      "attn_GBM_100": {
+        "r2": 0.00293945724536826,
+        "rmse": 2.0600838934690793
+      },
+      "plain_Ridge": {
+        "r2": -0.007549881935119629,
+        "rmse": 2.0708919074245107
+      },
+      "plain_GBM_100": {
+        "r2": 0.1541498978752558,
+        "rmse": 1.897452202528757
+      }
+    },
+    "training_time_s": 72.46007013320923
+  },
+  "ablations": {
+    "linear_head_raw": {
+      "f1": 0.7475728155339806,
+      "auc": 0.7924931339639915
+    },
+    "single_reservoir": {
+      "f1": 0.31654676258992803,
+      "auc": 0.7853728003255009
+    },
+    "no_attention_qhead": {
+      "f1": 0.8,
+      "auc": 0.7956464245753229
+    },
+    "attn_features_logreg": {
+      "f1": 0.6326530612244898,
+      "auc": 0.7522123893805309
+    }
+  },
+  "config": {
+    "reservoir_qubits": 4,
+    "n_reservoirs": 3,
+    "reservoir_depths": [
+      4,
+      6,
+      8
+    ],
+    "reservoir_patterns": [
+      "ring",
+      "ladder",
+      "star"
+    ],
+    "attention_re_upload_layers": 2,
+    "head_layer_schedule": [
+      1
+    ],
+    "observables_per_reservoir": 12,
+    "total_reservoir_features": 36
+  },
+  "training_refinements": [
+    "Reverted to original v1 hyperparams (lr=0.005, batch=32, 12 epochs)",
+    "2 attention re-upload layers (reverted from 3)",
+    "1-layer head only (2-layer abandoned)",
+    "Target normalization (z-score) for regression with MSE loss",
+    "Classical head comparison (LogReg, SVM) on attention features",
+    "Multiple regressors (Ridge, GBM) tested for Task 2",
+    "Grad clip 1.0, cosine annealing LR schedule"
+  ],
+  "timings": {
+    "reservoir_extraction": 21.739078044891357,
+    "task1a_training": 173.45969676971436,
+    "task2_training": 72.46007013320923
+  }
+}

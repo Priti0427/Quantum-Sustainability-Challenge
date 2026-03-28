@@ -1,0 +1,92 @@
+{
+  "algorithm": "Conformal Quantum Prediction (CQP)",
+  "notebook": "12_Conformal_Quantum_Prediction.ipynb",
+  "quantum": {
+    "qubits": 4,
+    "reservoir_layers": 10
+  },
+  "data_split": {
+    "train": "up to 2016",
+    "calibration": "2017-2018",
+    "test": "after 2018"
+  },
+  "conformal_results": {
+    "QRC+Ridge_standard": {
+      "coverage": 0.9054,
+      "avg_width": 8.411,
+      "q_hat": 4.2055
+    },
+    "QRC+Ridge_adaptive": {
+      "coverage": 0.8952,
+      "avg_width": 5.8025,
+      "q_hat": 2.0035
+    },
+    "QRC+GBM_standard": {
+      "coverage": 0.9054,
+      "avg_width": 6.8076,
+      "q_hat": 3.4038
+    },
+    "QRC+GBM_adaptive": {
+      "coverage": 0.8967,
+      "avg_width": 5.0155,
+      "q_hat": 2.2761
+    }
+  },
+  "coverage_sweep": {
+    "alpha": [
+      0.01,
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.3
+    ],
+    "target": [
+      0.99,
+      0.95,
+      0.9,
+      0.85,
+      0.8,
+      0.7
+    ],
+    "cls_coverage": [
+      0.9898,
+      0.9556,
+      0.8908,
+      0.8588,
+      0.7962,
+      0.6747
+    ],
+    "reg_coverage": [
+      0.9891,
+      0.9578,
+      0.9054,
+      0.8581,
+      0.8159,
+      0.6929
+    ],
+    "cls_avg_set_size": [
+      1.92,
+      1.737,
+      1.532,
+      1.417,
+      1.245,
+      0.982
+    ],
+    "reg_avg_width": [
+      18.9057,
+      12.8636,
+      8.411,
+      5.7068,
+      3.9231,
+      2.5489
+    ]
+  },
+  "timings": {
+    "reservoir_encoding": 104.6,
+    "train_cls": 0.19,
+    "train_reg": 0.01,
+    "train_cls_gbm": 3.65,
+    "train_reg_gbm": 3.59
+  }
+}

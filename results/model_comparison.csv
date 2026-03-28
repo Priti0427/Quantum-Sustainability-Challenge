@@ -1,7 +1,35 @@
-Model,Type,F1,Qubits,Parameters
-Logistic Regression,Classical,0.619,-,-
-Random Forest,Classical,0.5854,-,-
-XGBoost,Classical,0.6818,-,-
-SVM (RBF),Classical,0.6,-,-
-VQC (Quantum),Quantum,0.56,6,36
-Quantum Kernel SVM,Quantum,0.6829,6,-
+Task,Model,Type,Metric,Score,Qubits,Parameters,Notebook,F1,AUC,R2,RMSE
+1A,Logistic Regression,Classical,F1,0.6726,-,-,NB01,,,,
+1A,Random Forest,Classical,F1,0.6505,-,-,NB01,,,,
+1A,XGBoost,Classical,F1,0.6818,-,-,NB01,,,,
+1A,SVM (RBF),Classical,F1,0.7089,-,-,NB01,,,,
+1A,VQC,Quantum,F1,0.5600,6,36,NB01,,,,
+1A,Quantum Kernel SVM,Quantum,F1,0.6829,6,-,NB01,,,,
+1A,QRC + LogReg,Quantum,F1,0.7241,8,0 (fixed),NB05,,,,
+1A,Trainable Quantum Kernel + SVM,Quantum,F1,0.3871,6,12,NB05,,,,
+1A,Quantum Transfer Learning,Hybrid,F1,0.0000,4,24+MLP,NB05,,,,
+2,Linear Regression,Classical,R2,0.8024,-,-,NB02,,,,
+2,Random Forest,Classical,R2,0.9222,-,-,NB02,,,,
+2,XGBoost,Classical,R2,0.8930,-,-,NB02,,,,
+2,VQR,Quantum,R2,-2.3099,5,15,NB02,,,,
+2,Quantum Kernel Ridge,Quantum,R2,0.4892,5,-,NB02,,,,
+2,QRC + Ridge,Quantum,R2,0.4304,8,0 (fixed),NB05,,,,
+2,QLSTM (time series),Quantum,R2,0.9221,4,144,NB05,,,,
+2,Classical LSTM (time series),Classical,R2,0.7647,-,-,NB05,,,,
+2,Temporal XGBoost (time series),Classical,R2,0.8604,-,-,NB05,,,,
+1A,QCNN (conv+pool),Quantum,F1,0.2443,8,63,NB08,,,,
+1A,Projected Quantum Kernel + SVM,Quantum,F1,0.2162,6,0,NB08,,,,
+1A,QGAN-Augmented LogReg,Hybrid,F1,0.4189,6,54+MLP,NB08,,,,
+1A,Quanvolutional NN,Hybrid,F1,0.5217,4,quantum+MLP,NB08,,,,
+1A,Dressed Quantum Circuit,Hybrid,F1,0.6369,4,quantum+MLP,NB08,,,,
+1A,QART (Quantum Adaptive Reservoir Transformer),Quantum-Hybrid,F1,0.7545,4,attn+head+reservoirs,NB10,,,,
+2,QART (Quantum Adaptive Reservoir Transformer),Quantum-Hybrid,R2,0.2793,4,attn+head+reservoirs,NB10,,,,
+Classification,QGR — Classical LogReg,,,,,,NB11,1.0,1.0,,
+Regression,QGR — Classical Ridge,,,,,,NB11,,,0.5677,1.7107
+Classification,CQP — QRC+LogReg (90% conformal),,,,,,NB12,0.4273,0.7199,,
+Regression,CQP — QRC+Ridge (90% conformal),,,,,,NB12,,,0.096,2.4737
+Classification,MQTF — Multi-Task (fire cls),,,,,,NB13,0.6931,0.8927,,
+Regression,MQTF — Multi-Task (fire severity),,,,,,NB13,,,0.4748,1.8854
+Regression,MQTF — Multi-Task (insurance premium),,,,,,NB13,,,-1.296,0.1613
+Classification,Q-MoE — Q-MoE Concat All + GBM,,,,,,NB14,0.7817,0.9338,,
+Regression,Q-MoE — Q-MoE Concat All + GBM,,,,,,NB14,,,0.535,1.7742

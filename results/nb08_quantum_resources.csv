@@ -1,0 +1,6 @@
+Model,Qubits,Circuit Depth,Trainable Params,Architecture,Training Time (s)
+QCNN,8,~20 (conv+pool),69,Conv→Pool→Conv→Pool→Measure,282.9
+Projected Quantum Kernel,6,~8 (encoding+entangling),0,Encode→Entangle→Measure XYZ→RBF→SVM,1.1
+Quantum GAN (Generator),6,~12 (StronglyEntangling x3),54 quantum + MLP,Noise→VQC→Measure→PostNet,6.3
+Quanvolutional NN,4,~8 (StronglyEntangling x2),473,3 windows×VQC→concat→MLP,7.4
+Dressed Quantum Circuit,4,~12 per VQC (x2),443,MLP→VQC₁→MLP→VQC₂→MLP,8.3

@@ -1,0 +1,3 @@
+Component,Qubits,Count,Depths,TrainableParams
+Reservoir bank,4,3,"4,6,8",0
+Residual re-uploading experts,4,3,2,48

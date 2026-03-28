@@ -1,0 +1,39 @@
+{
+  "task_1a": {
+    "qcnn": {
+      "f1": 0.2443,
+      "auc": 0.8419,
+      "qubits": 8,
+      "type": "quantum"
+    },
+    "projected_quantum_kernel": {
+      "f1": 0.2162,
+      "auc": 0.6202,
+      "qubits": 6,
+      "type": "quantum"
+    },
+    "qgan_augmented_logreg": {
+      "f1": 0.4189,
+      "f1_baseline": 0.6486,
+      "qubits": 6,
+      "type": "hybrid"
+    },
+    "quanvolutional_nn": {
+      "f1": 0.5217,
+      "auc": 0.832,
+      "qubits": 4,
+      "type": "hybrid"
+    },
+    "dressed_quantum_circuit": {
+      "f1": 0.6369,
+      "auc": 0.7896,
+      "qubits": 4,
+      "type": "hybrid"
+    }
+  },
+  "data_sizes": {
+    "train": 500,
+    "test": 200,
+    "cloud_mode": false
+  }
+}

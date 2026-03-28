@@ -1,0 +1,64 @@
+{
+  "algorithm": "Quantum Graph Reservoir (QGR)",
+  "notebook": "11_Quantum_Graph_Reservoir.ipynb",
+  "graph": {
+    "nodes": 58,
+    "distance_edges": 254,
+    "coburn_edges": 558,
+    "total_edges": 759,
+    "distance_threshold_km": 150
+  },
+  "quantum": {
+    "qubits": 4,
+    "reservoir_layers": 10,
+    "observables": 11
+  },
+  "classification": {
+    "QGR (graph+reservoir)": {
+      "F1": 0.4691,
+      "AUC": 0.7513
+    },
+    "QRC (reservoir only)": {
+      "F1": 0.4102,
+      "AUC": 0.68
+    },
+    "Classical LogReg": {
+      "F1": 1.0,
+      "AUC": 1.0
+    },
+    "QGR + GBM": {
+      "F1": 0.6501,
+      "AUC": 0.8846
+    }
+  },
+  "regression": {
+    "QGR + Ridge": {
+      "R2": 0.1424,
+      "RMSE": 2.4093
+    },
+    "QRC + Ridge": {
+      "R2": 0.0691,
+      "RMSE": 2.5102
+    },
+    "Classical Ridge": {
+      "R2": 0.5677,
+      "RMSE": 1.7107
+    },
+    "QGR + GBM": {
+      "R2": 0.4434,
+      "RMSE": 1.9409
+    }
+  },
+  "timings": {
+    "reservoir_encoding": 103.81,
+    "graph_propagation": 0.05,
+    "cls_qgr": 0.09,
+    "cls_qrc": 0.01,
+    "cls_classical": 0.01,
+    "cls_qgr_gbm": 9.14,
+    "reg_qgr": 0.01,
+    "reg_qrc": 0.0,
+    "reg_classical": 0.0,
+    "reg_qgr_gbm": 9.54
+  }
+}
