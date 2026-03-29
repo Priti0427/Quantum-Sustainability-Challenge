@@ -30,16 +30,16 @@
   },
   "task_2": {
     "ridge": {
-      "r2": 0.1802,
+      "r2": 0.185,
       "type": "classical"
     },
     "qrc": {
-      "r2": 0.4304,
+      "r2": 0.2734,
       "qubits": 8,
       "type": "quantum"
     },
     "qlstm": {
-      "r2": 0.9221,
+      "r2": 0.3491,
       "qubits": 4,
       "type": "quantum"
     }

@@ -1,6 +1,6 @@
 Model,Qubits,Circuit Depth,Trainable Params,Fixed Params,Training Time (s)
-QRC (Task 1A),8,60,0,360,17.9
-QRC (Task 2),8,60,0,360,12.9
-Trainable Kernel,6,12,12,0,2356.3
-QLSTM,4,12,4x(3x4x3)=144,0,15.1
+QRC (Task 1A),8,60,0,360,18.0
+QRC (Task 2),8,60,0,360,12.5
+Trainable Kernel,6,12,12,0,2115.0
+QLSTM,4,12,4x(3x4x3)=144,0,13.4
 Transfer Learning,4,8,24 quantum + MLP,0,0.3

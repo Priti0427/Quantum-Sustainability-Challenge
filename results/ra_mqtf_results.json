@@ -1,0 +1,85 @@
+{
+  "algorithm": "RA-MQTF (Regime-Aware Multi-Task Quantum Temporal Fusion)",
+  "notebook": "04_proposed_algorithm/04_RegimeAware_MQTF.ipynb",
+  "quantum": {
+    "qubits": 4,
+    "n_experts": 4,
+    "reservoir_layers": 10,
+    "topologies": [
+      "ring",
+      "ladder",
+      "star",
+      "full"
+    ],
+    "observables_per_expert": 11,
+    "total_features": 44
+  },
+  "single_task": {
+    "fire_cls": {
+      "F1": 0.776,
+      "AUC": 0.939
+    },
+    "fire_sev": {
+      "R2": 0.5486,
+      "RMSE": 1.748
+    },
+    "premium": {
+      "R2": -1.3522,
+      "RMSE": 0.1632
+    }
+  },
+  "multi_task": {
+    "fire_cls": {
+      "F1": 0.8336,
+      "AUC": 0.9579
+    },
+    "fire_sev": {
+      "R2": 0.639,
+      "RMSE": 1.5633
+    },
+    "premium": {
+      "R2": -1.276,
+      "RMSE": 0.1606
+    }
+  },
+  "per_regime": [
+    {
+      "Regime": "A",
+      "N_test": 570,
+      "Fire_rate": 0.0737,
+      "F1": 0.6735,
+      "R2": 0.5206
+    },
+    {
+      "Regime": "B",
+      "N_test": 308,
+      "Fire_rate": 0.4188,
+      "F1": 0.9291,
+      "R2": 0.7523
+    },
+    {
+      "Regime": "C",
+      "N_test": 402,
+      "Fire_rate": 0.2289,
+      "F1": 0.8,
+      "R2": 0.5478
+    },
+    {
+      "Regime": "D",
+      "N_test": 94,
+      "Fire_rate": 0.2447,
+      "F1": 0.7826,
+      "R2": 0.4967
+    }
+  ],
+  "conformal": {
+    "alpha": 0.1,
+    "cls_coverage": 0.9441,
+    "sev_coverage": 0.8697,
+    "prem_coverage": 0.4869
+  },
+  "timings": {
+    "expert_encoding": 400.22,
+    "multitask_train": 5.15
+  }
+}

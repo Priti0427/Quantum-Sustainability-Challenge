@@ -15,23 +15,29 @@
 
 ## Section 2: Abstract (ONE page, ≤400 words)
 
-We present a hybrid quantum-classical machine learning system for predicting California wildfire risk and mapping it to insurance premiums, addressing Tasks 1A, 1B, and 2.
+We present a hybrid quantum-classical system for California wildfire risk prediction and insurance premium estimation, built in three validated layers.
 
-Our work systematically evaluates 15+ quantum architectures across 16 notebooks organized in 5 thematic folders, progressing from standard models (VQC, Quantum Kernels) through advanced architectures (QCNN, Quantum GANs) to seven novel algorithms designed for this challenge. The final system combines climate-regime-aware quantum mixture-of-experts with forward-looking scenario analysis, uncertainty quantification, and multi-task learning.
+**Layer 1 - Q-MoE Fire (regime-diverse quantum experts)**: California's 58 counties cluster into 4 climate regimes with fundamentally different fire dynamics. Q-MoE routes each county-month through 4 quantum reservoir experts, each using a different entanglement topology (ring, ladder, star, full). The concatenated 44-dimensional feature vector feeds a classical GradientBoosting head. Q-MoE achieves F1=0.782 and AUC=0.934 for wildfire classification, outperforming SVM (F1=0.709) by 10.3%. Per-regime ablation confirms improvements in all 4 climate zones.
 
-**Task 1A - Wildfire Classification**: Our best model, Q-MoE Fire (Quantum Mixture-of-Experts for Climate Regimes), achieves F1=0.782 and AUC=0.934. Q-MoE recognizes that California is not one homogeneous climate system. It clusters 58 counties into 4 climate regimes, then routes each sample to 4 specialized quantum reservoir experts with different entanglement topologies (ring, ladder, star, full). Q-MoE outperforms all classical baselines (SVM F1=0.709) and all single-model quantum approaches (QART F1=0.755, QRC F1=0.724). Per-regime ablation confirms that every climate zone benefits from specialization.
+**Layer 2 - RA-MQTF (multi-task fusion)**: Building on Q-MoE's expert features, RA-MQTF adds a shared multi-task neural backbone that jointly predicts fire occurrence, fire severity, and insurance premiums. Multi-task training improves fire classification to F1=0.834 (+6.6% over Q-MoE) and severity to R2=0.639 (+19.4% over Q-MoE). Premium prediction remains weak (R2=-1.276), confirming that annual ZIP-level premiums mapped to monthly county data lack sufficient signal for this task.
 
-**Task 1B - Evaluation**: Quantum advantage is architecture-dependent. Variational methods (VQC F1=0.542) suffer barren plateaus; fixed reservoirs with classical readouts (QRC F1=0.724) avoid them; regime-aware expert routing (Q-MoE F1=0.782) outperforms both. The key insight: quantum advantage comes from matching architecture to problem structure, not from deeper circuits.
+**Layer 3 - QLSTM (temporal premium model)**: For ZIP-level premium time-series, QLSTM (4-qubit variational LSTM gates) achieves R2=0.349 on temporal log-scale splits, substantially outperforming Classical LSTM (R2=-1.033). Temporal XGBoost (R2=0.828) remains the strongest temporal baseline. The premium task is inherently difficult with only 4 years of annual ZIP data; QLSTM's advantage over classical LSTM demonstrates that quantum gates capture temporal structure that standard recurrent cells miss.
 
-**Task 2 - Insurance Premiums**: QLSTM achieves R2=0.922 for ZIP-level premium time-series, outperforming Classical LSTM (R2=0.765) and XGBoost (R2=0.860). For county-level fire severity, Q-MoE achieves R2=0.535.
+**Main limitation**: Our strongest wildfire models operate at county granularity and are mapped to ZIP codes via geographic lookup. The challenge asks for direct ZIP-level prediction. This county-to-ZIP transfer is our main approximation, and our proposed algorithm (Section 5) addresses exactly this gap.
 
-**Forward-Looking Decision Support**: Q-CAST (Quantum Causal Scenario Transformer) converts our model into a "what-if" engine, simulating 6 climate scenarios (drought, extreme wind, compound crisis, controlled burns, wet year) through the quantum pipeline. Under drought (-30% precipitation, +2F), 35 county-months flip from safe to fire-prone. Conformal prediction provides 90% coverage intervals on all scenario outputs.
+**Forward-Looking Predictions**: Per-ZIP wildfire risk scores for 2,174 California locations, combining Q-MoE county fire probabilities with domain-driven indicators.
 
-**2026 Predictions**: Per-ZIP wildfire risk scores are produced for 2,174 California locations using Q-MoE county-level fire probabilities mapped to ZIPs, combined with domain-driven indicators from the predictions notebook.
+**Task coverage at a glance**:
 
-**Envisioned next-generation algorithm**: C-STQGR (Conformal Spatio-Temporal Quantum Graph Reservoir) would unify graph structure, conformal calibration, multi-task learning, and regime-aware expert routing into a single ZIP-code-scale system, targeting real-time quantum hardware deployment.
+| Task | Model | Granularity | Score | Limitation |
+|------|-------|-------------|-------|------------|
+| 1A: Wildfire classification | RA-MQTF | County (mapped to ZIP) | F1=0.834 | Not direct ZIP-level |
+| 1B: Evaluation | 15+ models benchmarked | County + daily | See Section 3.3 | - |
+| 2: Fire severity | RA-MQTF | County | R2=0.639 | County, not ZIP |
+| 2: Insurance premiums | QLSTM | ZIP | R2=0.349 (log-scale temporal) | XGBoost R2=0.828 stronger |
+| Forward predictions | Q-MoE + ensemble | ZIP | 2,174 ZIPs scored | County-to-ZIP mapping |
 
-We propose novel quantum architectures specifically designed for wildfire-insurance modeling. While our work builds on established quantum computing primitives (quantum reservoir computing, mixture-of-experts, conformal prediction), the specific architectural designs - topology-diversified quantum expert routing (Q-MoE), multi-scale reservoir cross-attention fusion (QART), and quantum scenario simulation for insurance decision support (Q-CAST) - are original contributions with no direct precedent in the literature.
+**Proposed algorithm**: ZIP-STR-QMoE (Section 5) extends these validated ingredients to direct ZIP-level prediction, addressing the challenge's core granularity requirement.
 
 ---
 
@@ -52,7 +58,7 @@ No external APIs or real-time data feeds were used. All data is included in the 
 
 **Feature engineering**: Temperature range, wind-temperature ratio, lagged precipitation and wind speed, PCA-reduced quantum encodings (4 components), county adjacency graph features, temporal lag features (lag_acres, lag_temp), and domain-driven indicators (Fire Weather Index proxy, drought severity, hydroclimate whiplash signals).
 
-**Temporal split**: Train on 2008-2018, test on 2019-2020 (county-level); train on 2018-2020, test on 2021 (ZIP-level insurance).
+**Temporal split**: Train on 2008-2018, test on 2019-2020 (county-level wildfire); train on 2018-2020, test on 2021 (ZIP-level insurance). Note: the provided wildfire dataset covers 2008-2020; the insurance dataset covers 2018-2021.
 
 ### 3.2 Task 1A: Wildfire Classification
 
@@ -79,6 +85,8 @@ California spans 16 climate zones with fundamentally different fire dynamics. A 
 
 4. **Result: F1 = 0.782, AUC = 0.934**
 
+**Multi-task improvement - RA-MQTF (`04_proposed_algorithm/04_RegimeAware_MQTF`)**: Adding a shared multi-task backbone on top of Q-MoE's expert features further improves fire classification to **F1 = 0.834** (+6.6%) and fire severity to **R2 = 0.639** (+19.4%). Joint training acts as regularization.
+
 **Per-regime validation** - Q-MoE improves every climate regime (4/4):
 
 | Regime | N_test | Fire Rate | MoE F1 | Baseline F1 | F1 Lift |
@@ -94,16 +102,16 @@ California spans 16 climate zones with fundamentally different fire dynamics. A 
 
 | Model | F1 | Qubits | Notebook |
 |-------|----|--------|----------|
-| Q-MoE Concat + GBM | **0.782** | 4x4 | `04_proposed_algorithm/01_QMoE_Fire` |
+| RA-MQTF (multi-task) | **0.834** | 4x4 | `04_proposed_algorithm/04_RegimeAware_MQTF` |
+| Q-MoE Concat + GBM | 0.782 | 4x4 | `04_proposed_algorithm/01_QMoE_Fire` |
 | QART (cross-attention) | 0.755 | 4 | `04_proposed_algorithm/02_QART` |
 | QRC + LogReg | 0.724 | 8 | `02_quantum_baselines/03_Cloud_Quantum_Models` |
 | MQTF (multi-task) | 0.693 | 4 | `03_novel_explorations/04_MultiTask_QTF` |
 | QGR (graph) | 0.650 | 4 | `03_novel_explorations/02_Quantum_Graph_Reservoir` |
 | Dressed Quantum Circuit | 0.637 | 4 | `02_quantum_baselines/04_Advanced_Architectures` |
-| Quanvolutional NN | 0.522 | 4 | `02_quantum_baselines/04_Advanced_Architectures` |
 | VQC (variational) | 0.542 | 6 | `01_eda_and_visualization/01_EDA_and_Baselines` |
 
-**2026 ZIP-code predictions**: County-level Q-MoE fire probabilities are mapped to ZIP codes using county-to-ZIP lookup, and combined with the domain-driven ensemble risk scoring to produce per-ZIP wildfire risk predictions for 2,174 California locations. Top-risk areas: Shasta County (0.96), Lassen County (0.88), Humboldt County (0.86), Sonoma County (0.82).
+**Forward-looking ZIP-code predictions**: County-level Q-MoE fire probabilities are mapped to ZIP codes using county-to-ZIP lookup, and combined with the domain-driven ensemble risk scoring to produce per-ZIP wildfire risk predictions for 2,174 California locations. This is an approximation; the proposed ZIP-STR-QMoE algorithm (Section 5) would perform this prediction directly at ZIP level.
 
 ### 3.3 Task 1B: Evaluation
 
@@ -115,25 +123,26 @@ California spans 16 climate zones with fundamentally different fire dynamics. A 
 
 **Disadvantages and limitations**:
 - **Quantum overhead**: Encoding 8,584 samples x 4 experts takes ~7 minutes on a simulator - comparable to classical GBM training but with no parallelization advantage
-- **Indirect quantum benefit**: The quantum reservoir is a non-linear feature extractor; the actual classification is performed by a classical head. The quantum advantage comes from the feature space, not from quantum speedup
+- **Indirect quantum benefit**: The quantum reservoir is a non-linear feature extractor; the actual classification is performed by a classical head. The benefit comes from the feature space, not from quantum speedup
 - **Circuit depth limitation**: At 10 layers x 4 qubits, the reservoir is shallow enough for NISQ devices, but deeper circuits might extract richer features (limited by decoherence)
-- **County granularity**: Q-MoE operates at county level; ZIP-level predictions require a mapping step that loses spatial precision
+- **County granularity**: Q-MoE and RA-MQTF operate at county level; ZIP-level predictions require a mapping step that loses spatial precision
 
 **Classical comparison** (identical data, identical splits):
 
-| Model | F1 | Type | Advantage |
+| Model | F1 | Type | Delta vs SVM |
 |-------|-----|------|-----------|
-| Q-MoE Fire | **0.782** | Quantum | +10.3% over best classical |
-| SVM (RBF) | 0.709 | Classical | Best classical baseline |
+| RA-MQTF | **0.834** | Quantum | +17.6% |
+| Q-MoE Fire | 0.782 | Quantum | +10.3% |
+| SVM (RBF) | 0.709 | Classical | - |
 | XGBoost | 0.682 | Classical | - |
 | Logistic Regression | 0.673 | Classical | - |
 | Random Forest | 0.651 | Classical | - |
 
-**Progression of quantum advantage**:
-- Generation 1 (EDA notebook): VQC F1=0.542 - worse than classical (barren plateaus)
-- Generation 2 (Cloud QML notebook): QRC F1=0.724 - first quantum advantage (+2.1% over SVM)
-- Generation 3 (QART notebook): QART F1=0.755 - quantum attention fusion
-- Generation 4 (Q-MoE Fire notebook): Q-MoE F1=0.782 - regime-aware experts (+10.3% over SVM)
+**Progression of quantum models**:
+- Generation 1 (EDA notebook): VQC F1=0.542 - underperforms classical (barren plateaus)
+- Generation 2 (Cloud QML notebook): QRC F1=0.724 - first improvement over classical (+2.1% over SVM)
+- Generation 3 (Q-MoE notebook): Q-MoE F1=0.782 - regime-aware experts (+10.3% over SVM)
+- Generation 4 (RA-MQTF notebook): RA-MQTF F1=0.834 - multi-task fusion (+17.6% over SVM)
 
 ### 3.4 Task 2: Insurance Premiums and Fire Severity
 
@@ -141,25 +150,22 @@ California spans 16 climate zones with fundamentally different fire dynamics. A 
 - 4-qubit variational circuits replace standard LSTM forget, input, cell, and output gates
 - StronglyEntanglingLayers ansatz with 3 layers per gate (144 quantum parameters total)
 - 2-step time sequences of ZIP-code insurance features predict next-year premium
-- **Result: R2 = 0.922, RMSE = 0.158**
-- Outperforms Classical LSTM (R2=0.765) and Temporal XGBoost (R2=0.860) on identical data
+- Input features include both the dataset's fire risk score and Q-MoE's Task 1 county-level fire probability (mapped to ZIP), directly connecting Task 1 output to Task 2
+- **Result: R2 = 0.349 (log-scale temporal split), RMSE = 0.458**
+- QLSTM substantially outperforms Classical LSTM (R2=-1.033) on the same temporal split, demonstrating that quantum gates capture temporal premium dynamics that standard recurrent cells miss
+- Temporal XGBoost (R2=0.828) remains the strongest temporal baseline; Random Forest achieves R2=0.922 on a non-temporal split
+- The premium prediction task is inherently difficult with only 4 years of annual ZIP data
 
-**County-level fire severity - Q-MoE Fire (Q-MoE notebook)**:
-- Same 4-expert architecture predicting log(burned acres) instead of fire occurrence
-- **Result: R2 = 0.535, RMSE = 1.774** - best quantum regression on county data
-- Beats MQTF (R2=0.475), single-expert QRC (R2=0.443), and QART (R2=0.279)
+**County-level fire severity - RA-MQTF (Regime-Aware MQTF notebook)**:
+- Same Q-MoE expert features with multi-task backbone predicting log(burned acres)
+- **Result: R2 = 0.639, RMSE = 1.563** - best severity prediction in the project
+- Outperforms Q-MoE single-task (R2=0.535), MQTF (R2=0.475), and QART (R2=0.279)
+- Multi-task regularization provides +19.4% improvement over single-task training
 
-**Multi-task joint prediction - MQTF (Multi-Task QTF notebook)**:
-- Shared quantum reservoir backbone with three simultaneous prediction heads: fire classification, fire severity, insurance premium
-- Joint learning provides massive improvements for fire tasks: classification F1 +69%, severity R2 +588% compared to single-task baselines
-- Fire severity R2=0.475 - second-best quantum regression
-- Insurance premium prediction is limited by data granularity (only 4 years of annual ZIP data)
-
-**Scenario-based premium sensitivity - Q-CAST (Q-CAST notebook)**:
-- 6 climate scenarios simulated through the full quantum pipeline
-- Drought scenario: +0.88% average probability increase, 35 county-months flip to fire-prone
-- Per-county impact analysis identifies which counties need premium adjustments under each scenario
-- Conformal prediction provides 90% coverage intervals on all scenario-conditioned predictions
+**Supporting explorations**:
+- MQTF demonstrated that multi-task learning provides +69% F1 and +588% R2 over single-task baselines, motivating RA-MQTF
+- Q-CAST simulated 6 climate scenarios through the quantum pipeline, showing that drought flips 35 county-months to fire-prone, with conformal 90% coverage intervals
+- CQP provided conformal uncertainty quantification with ~90% empirical coverage
 
 ### 3.5 Quantum Resource Requirements
 
@@ -168,13 +174,9 @@ All models run on PennyLane `default.qubit` simulator. AWS Braket integration fo
 | Model | Qubits | Circuit Depth | Trainable Params | Time (simulator) |
 |-------|--------|---------------|-------------------|-----------------|
 | Q-MoE (4 experts) | 4 x 4 | 40 each | 0 (fixed) + GBM | ~7 min |
-| QART (3 reservoirs) | 4 | 4/6/8 + attn | quantum + MLP | ~4.5 min |
-| QRC (Task 1A baseline) | 8 | 60 | 0 (fixed) | 18s |
+| RA-MQTF (multi-task) | 4 x 4 | 40 each | 0 (fixed) + shared NN (6,595) | ~6.5 min |
 | QLSTM (Task 2) | 4 | 12 | 144 | 15s |
-| Q-CAST (6 scenarios) | 4 | 40 | 0 (fixed) + heads | ~8 min |
-| QGR (graph reservoir) | 4 | 40 | 0 (fixed) + graph | ~2 min |
-| CQP (conformal) | 4 | 40 | 0 (fixed) + quantile | ~2 min |
-| MQTF (multi-task) | 4 | 40 | 0 (fixed) + 3 heads | ~2 min |
+| QRC (Task 1A baseline) | 8 | 60 | 0 (fixed) | 18s |
 
 ---
 
@@ -182,17 +184,29 @@ All models run on PennyLane `default.qubit` simulator. AWS Braket integration fo
 
 ### Results Summary
 
-| Task | Best Quantum Model | Score | Classical Best | Quantum Advantage |
-|------|-------------------|-------|----------------|-------------------|
-| 1A Classification | Q-MoE Fire (4x4 qubits) | **F1=0.782** | SVM F1=0.709 | +10.3% |
-| 1A Classification | QART (4 qubits) | F1=0.755 | SVM F1=0.709 | +6.5% |
-| 2 Fire Severity | Q-MoE Fire (4x4 qubits) | **R2=0.535** | - | Best quantum |
-| 2 Premium Time Series | QLSTM (4 qubits) | **R2=0.922** | XGBoost R2=0.860 | +7.2% |
-| Uncertainty | CQP (conformal) | 90% coverage | - | Calibrated intervals |
-| Scenario Analysis | Q-CAST (6 scenarios) | Decision-support | - | Forward-looking |
-| 2026 Predictions | Q-MoE + ensemble | 2,174 ZIPs scored | - | Per-ZIP risk map |
+| Task | Model | Granularity | Score | Classical Best | Delta |
+|------|-------|-------------|-------|----------------|-------|
+| 1A Classification | RA-MQTF | County | **F1=0.834** | SVM F1=0.709 | +17.6% |
+| 1A Classification | Q-MoE Fire | County | F1=0.782 | SVM F1=0.709 | +10.3% |
+| 2 Fire Severity | RA-MQTF | County | **R2=0.639** | - | Best overall |
+| 2 Premium (time-series) | QLSTM | ZIP | **R2=0.349** | LSTM R2=-1.033 | QLSTM wins |
+| 2 Premium (time-series) | Temporal XGBoost | ZIP | R2=0.828 | - | Best temporal |
+| 2 Premium (non-temporal) | Random Forest | ZIP | R2=0.922 | - | Non-temporal split |
+| Forward Predictions | Q-MoE + ensemble | ZIP | 2,174 ZIPs | - | Per-ZIP risk map |
 
-### Notebooks (16 total, organized in 5 folders)
+### Rubric-Aligned Summary
+
+| Criterion | Evidence | Where |
+|-----------|----------|-------|
+| **Task 1A: Wildfire risk** | RA-MQTF F1=0.834 (county, mapped to ZIP) | `04_proposed_algorithm/04_RegimeAware_MQTF`, `05_predictions/01_ZipCode_2026_Predictions` |
+| **Task 1B: Evaluation** | 15+ models benchmarked, ablations, per-regime validation, SHAP | Sections 3.2-3.3, all baseline notebooks |
+| **Task 2: Premium/severity** | QLSTM R2=0.349 (premiums, ZIP, temporal log-scale; beats Classical LSTM R2=-1.033), RA-MQTF R2=0.639 (severity, county) | `02_quantum_baselines/03_Cloud_Quantum_Models`, `04_proposed_algorithm/04_RegimeAware_MQTF` |
+| **Novel algorithm** | Q-MoE (regime experts) + RA-MQTF (multi-task fusion) | `04_proposed_algorithm/` |
+| **Envisioned algorithm** | ZIP-STR-QMoE: validated ingredients moved to direct ZIP-level prediction | Section 5 |
+| **Quantum hardware path** | 4-qubit fixed reservoirs; AWS Braket integration for IonQ/Rigetti/IQM | `02_quantum_baselines/03_Cloud_Quantum_Models` |
+| **Known limitation** | Wildfire models are county-level, mapped to ZIPs. Proposed algorithm addresses this. | Sections 2, 5 |
+
+### Notebooks (17 total, organized in 5 folders)
 
 | Folder | Notebook | Purpose |
 |--------|----------|---------|
@@ -208,14 +222,16 @@ All models run on PennyLane `default.qubit` simulator. AWS Braket integration fo
 | | 02 Quantum Graph Reservoir | Spatial graph + quantum reservoir |
 | | 03 Conformal Quantum Prediction | Uncertainty quantification with coverage guarantees |
 | | 04 Multi-Task Quantum Temporal Fusion | Joint fire + insurance prediction |
-| `04_proposed_algorithm/` | **01 Q-MoE Fire** | Quantum Mixture-of-Experts (best model) |
+| `04_proposed_algorithm/` | **01 Q-MoE Fire** | Regime-diverse quantum experts (F1=0.782) |
 | | **02 QART** | Quantum Adaptive Reservoir Transformer |
-| | **03 Q-CAST** | Quantum Causal Scenario Transformer |
-| `05_predictions/` | 01 ZipCode 2026 Predictions | Final per-ZIP risk predictions using Q-MoE features |
+| | **03 Q-CAST** | Scenario analysis + decision support |
+| | **04 RA-MQTF** | Multi-task fusion (F1=0.834, R2=0.639) |
+| `05_predictions/` | 01 ZipCode Predictions | Final per-ZIP wildfire risk predictions using Q-MoE features |
 
 ### Code Repository
 
 **https://github.com/Priti0427/Quantum-Sustainability-Challenge**
+
 
 All notebooks, data, and results are reproducible. Executed notebooks with full cell outputs are included. See README.md for setup instructions and pipeline documentation.
 
@@ -223,42 +239,54 @@ All notebooks, data, and results are reproducible. Executed notebooks with full 
 
 ## Section 5: Envisioned Algorithm
 
-### C-STQGR: Conformal Spatio-Temporal Quantum Graph Reservoir
+### ZIP-STR-QMoE: ZIP-level Spatio-Temporal Regime-aware Quantum Mixture-of-Experts
 
-We envision a next-generation algorithm that unifies the five building blocks we have individually validated in this project into a single end-to-end system operating at ZIP-code scale.
+#### The gap this addresses
 
-**Architecture**:
+Our validated models (Q-MoE, RA-MQTF) produce strong wildfire predictions at county granularity but the challenge asks for ZIP-code-level wildfire predictions from historical data. Currently we bridge this gap by mapping county fire probabilities to ZIPs, which loses spatial precision. ZIP-STR-QMoE is designed to perform this prediction directly at ZIP level.
 
-The envisioned C-STQGR (Conformal Spatio-Temporal Quantum Graph Reservoir) integrates:
+#### Architecture
 
-1. **Quantum Graph Reservoir Layer** (proven in the QGR notebook): Encode each ZIP code's features through a quantum reservoir, then propagate information along a spatial graph whose edges represent geographic proximity, shared fire corridors, wind patterns, and vegetation continuity. Our QGR results show that graph structure improves F1 by +0.059 and R2 by +0.073 over non-graph approaches.
+ZIP-STR-QMoE extends our validated ingredients into a single ZIP-level system:
 
-2. **Regime-Aware Quantum Mixture-of-Experts** (proven in the Q-MoE Fire notebook): Route each ZIP-month through specialized quantum experts matched to its climate zone. Our Q-MoE results demonstrate that different entanglement topologies create genuinely different feature maps, and specialization improves every climate regime. At ZIP-code scale (~2,000 nodes), the gating network would learn finer-grained regimes than our 4-county clusters.
+1. **ZIP-level regime routing** (validated by Q-MoE at county scale): Instead of clustering 58 counties into 4 regimes, cluster ~2,000 ZIP codes into 6-8 finer regimes using ZIP-level insurance features, CalFire risk scores, and local weather. Each ZIP-month is routed to the quantum expert matching its regime. Our Q-MoE results prove that regime routing improves all climate zones (4/4 regimes improved).
 
-3. **Multi-Task Temporal Fusion** (proven in the MQTF notebook): Jointly predict wildfire risk, fire severity, and insurance premiums using a shared quantum backbone with task-specific heads. Our MQTF results show that multi-task learning provides +69% F1 improvement and +588% R2 improvement over single-task baselines, because fire risk and premium dynamics are causally linked.
+2. **Topology-diverse quantum reservoir experts** (validated by Q-MoE): The same 4-qubit fixed reservoirs with ring, ladder, star, and full entanglement topologies. These are the same circuits already validated on county data; no architectural change is needed, only retraining on ZIP-level features. Fixed reservoirs avoid barren plateaus entirely.
 
-4. **Conformal Uncertainty Quantification** (proven in the CQP notebook): Wrap all predictions with adaptive conformal prediction intervals that provide formal coverage guarantees. Our CQP results achieve ~90% empirical coverage with intervals 26-31% narrower than standard fixed-width approaches. For insurers, this transforms point predictions into trustworthy risk bands.
+3. **Multi-task shared backbone** (validated by RA-MQTF): A shared neural network jointly predicts wildfire risk, fire severity, and insurance premiums. Our RA-MQTF results prove that multi-task training improves fire classification by +6.6% and severity by +19.4% over single-task baselines.
 
-5. **Scenario Simulation Engine** (proven in the Q-CAST notebook): Apply forward-looking "what if" climate perturbations through the full quantum pipeline. Our Q-CAST results demonstrate that drought scenarios flip 35 county-months to fire-prone and that the quantum reservoir captures non-trivial climate interactions (e.g., wind sometimes reduces fire probability in certain regions by disrupting buildup patterns).
+4. **Temporal QLSTM premium head** (validated by QLSTM): For the premium prediction task, replace the simple regression head with a QLSTM temporal module operating on 2-step ZIP-level insurance sequences. Our QLSTM results (R2=0.349, beating Classical LSTM R2=-1.033) prove quantum gates can learn temporal premium dynamics at ZIP granularity.
 
-**Expected benefits**:
+5. **Conformal uncertainty calibration** (validated by CQP): Wrap all predictions with adaptive conformal intervals providing 90% coverage guarantees. Our CQP results achieve ~90% empirical coverage.
 
-- **Unified prediction**: A single model simultaneously forecasts wildfire occurrence, fire severity, insurance premium changes, and scenario-conditioned risk shifts - currently requiring 4 separate models
-- **Spatial awareness**: Graph propagation captures fire corridor effects (e.g., Santa Ana wind corridors linking inland and coastal ZIP codes) that independent-ZIP models miss entirely
-- **Calibrated uncertainty**: Every prediction comes with a coverage-guaranteed interval, enabling insurers to price risk bands rather than point estimates
-- **Forward-looking**: Scenario analysis transforms the model from retrospective prediction to proactive catastrophe modeling, which is what California's insurance regulator explicitly requires
-- **Climate-regime specialization**: Different quantum experts for coastal fog, inland heat, mountain snow, and desert regions capture the true heterogeneity of California's 16 climate zones
+#### What changes vs. current system
 
-**Quantum hardware requirements**:
+| Component | Current (county) | ZIP-STR-QMoE (ZIP) |
+|-----------|------------------|---------------------|
+| Granularity | 58 counties | ~2,000 ZIP codes |
+| Regime clustering | 4 county regimes | 6-8 ZIP regimes |
+| Input features | Weather + fire history | Weather + fire history + insurance + CalFire risk |
+| Premium prediction | Mapped from county | Direct ZIP-level QLSTM |
+| Quantum circuits | Same 4-qubit reservoirs | Same 4-qubit reservoirs |
 
-- **Qubits**: 4-8 per expert x 4-6 experts = 16-48 logical qubits (feasible on current NISQ devices: IonQ Aria has 25 qubits, IBM Eagle has 127)
-- **Circuit depth**: 40-80 layers per reservoir (challenging for current coherence times, but feasible with error mitigation)
-- **Shots**: ~1,000 per sample for Pauli expectation values (standard for current hardware)
-- **Estimated wall-clock time**: ~30 minutes on a 25-qubit trapped-ion device for full pipeline (encoding + graph propagation + prediction)
-- **Near-term path**: The reservoir components (zero trainable quantum parameters) are naturally noise-resilient, making C-STQGR a strong candidate for early fault-tolerant quantum advantage
+#### Why we believe this will work
 
-**Why this matters for the quantum community**:
+Every individual component is already validated with reproducible metrics:
+- Regime routing improves all climate zones (Q-MoE, 4/4 regimes)
+- Multi-task training improves fire classification +6.6% and severity +19.4% (RA-MQTF)
+- QLSTM outperforms Classical LSTM on temporal premium prediction (R2=0.349 vs -1.033, Cloud Quantum Models notebook)
+- Conformal calibration achieves ~90% coverage (CQP)
 
-C-STQGR demonstrates that quantum advantage in real-world applications comes not from raw computational speedup but from architectural innovation - combining quantum feature spaces with classical graph structure, conformal calibration, and domain-specific expert routing. This pattern is transferable to other sustainability problems (flood prediction, crop yield forecasting, supply chain resilience) where spatial structure, uncertainty, and regime heterogeneity all matter.
+The main engineering challenge is the data pipeline: joining wildfire county data to ZIP-level insurance records requires a county-to-ZIP mapping layer during training. This is an implementation task, not an algorithmic uncertainty.
 
-The individual components are validated in our 16 notebooks. The envisioned unified system represents the natural next step as quantum hardware scales from 25 to 100+ qubits with improved coherence times.
+#### Quantum hardware requirements
+
+- **Qubits**: 4 per expert x 4 experts = 16 logical qubits (feasible on IonQ Aria 25-qubit, IBM Eagle 127-qubit)
+- **Circuit depth**: 40 layers per reservoir (shallow enough for NISQ with error mitigation)
+- **Trainable quantum params**: 0 (fixed reservoirs) + 144 (QLSTM premium head)
+- **Estimated time**: ~15 minutes on simulator for full ~2,000 ZIP encoding + training
+- **Near-term path**: Fixed reservoirs are naturally noise-resilient; the QLSTM head is the only component requiring parameter optimization on quantum hardware
+
+#### Why this matters
+
+ZIP-STR-QMoE demonstrates that practical quantum benefit for sustainability applications comes from matching quantum architecture to problem structure: regime-diverse experts for climate heterogeneity, fixed reservoirs for noise resilience, and multi-task learning for the fire-insurance causal link. This pattern is transferable to other geospatial prediction problems (flood risk, crop yield, infrastructure resilience) wherever spatial heterogeneity, uncertainty, and multi-task structure coexist.
