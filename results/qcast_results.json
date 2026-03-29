@@ -80,12 +80,12 @@
     "n_improved": 23
   },
   "timings": {
-    "baseline_encoding": 93.79,
+    "baseline_encoding": 94.61,
     "scenario_Baseline": 0.01,
-    "scenario_Drought": 96.23,
-    "scenario_Extreme Wind": 94.93,
-    "scenario_Compound Crisis": 93.17,
-    "scenario_Mitigation (Burns)": 93.07,
-    "scenario_Wet Year": 90.31
+    "scenario_Drought": 95.0,
+    "scenario_Extreme Wind": 96.05,
+    "scenario_Compound Crisis": 95.6,
+    "scenario_Mitigation (Burns)": 95.66,
+    "scenario_Wet Year": 96.84
   }
 }
