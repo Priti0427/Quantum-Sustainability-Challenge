@@ -7,22 +7,27 @@ Quantum Machine Learning solution for the Deloitte Quantum Sustainability Challe
 ```
 ├── data/                              # Datasets (wildfire + insurance)
 ├── notebooks/
-│   ├── 01_EDA_and_Baselines.ipynb           # EDA + classical & quantum baselines (Task 1A)
-│   ├── 02_Task2_Insurance_QML.ipynb         # Insurance premium prediction (Task 2)
-│   ├── 03_Geospatial_Visualization.ipynb    # Maps, scalability analysis
-│   ├── 04_Clustering_UMAP_HDBSCAN.ipynb     # ZIP-code risk clustering (5 tiers)
-│   ├── 04_Improved_Quantum_Models.ipynb     # PCA, data re-uploading, hybrid ensemble
-│   ├── 05_Cloud_Quantum_Models.ipynb        # QRC, QLSTM, Trainable Kernel, Transfer Learning
-│   ├── 06_ZipCode_2026_Predictions.ipynb    # Final 2026 per-ZIP risk predictions
-│   ├── 07_FullHistory_Wildfire_Analysis.ipynb # Extended 40-year wildfire analysis
-│   ├── 08_Advanced_Quantum_Architectures.ipynb # QCNN, PQK, QGAN, Quanvolution, Dressed Circuit
-│   ├── 09_Regime_Adaptive_Multiscale_QML.ipynb # RAM-QRSRE novel algorithm
-│   ├── 10_Quantum_Adaptive_Reservoir_Transformer.ipynb # QART — core novel algorithm
-│   ├── 11_Quantum_Graph_Reservoir.ipynb          # QGR — spatial graph + quantum reservoir
-│   ├── 12_Conformal_Quantum_Prediction.ipynb     # CQP — conformal uncertainty quantification
-│   ├── 13_MultiTask_Quantum_Temporal_Fusion.ipynb # MQTF — joint fire + insurance prediction
-│   ├── 14_QMoE_Fire.ipynb                       # Q-MoE Fire — regime-aware quantum mixture-of-experts
-│   └── 15_QCAST_Scenario_Transformer.ipynb      # Q-CAST — forward-looking "what if" scenario analysis
+│   ├── 01_eda_and_visualization/            # Exploratory analysis & visualization
+│   │   ├── 01_EDA_and_Baselines.ipynb           # EDA + classical & quantum baselines (Task 1A)
+│   │   ├── 02_Geospatial_Visualization.ipynb    # Maps, scalability analysis
+│   │   ├── 03_Clustering_UMAP_HDBSCAN.ipynb     # ZIP-code risk clustering (5 tiers)
+│   │   └── 04_FullHistory_Wildfire_Analysis.ipynb # Extended 40-year wildfire analysis
+│   ├── 02_quantum_baselines/                # Quantum ML baselines & architectures
+│   │   ├── 01_Task2_Insurance_QML.ipynb         # Insurance premium prediction (Task 2)
+│   │   ├── 02_Improved_Quantum_Models.ipynb     # PCA, data re-uploading, hybrid ensemble
+│   │   ├── 03_Cloud_Quantum_Models.ipynb        # QRC, QLSTM, Trainable Kernel, Transfer Learning
+│   │   └── 04_Advanced_Quantum_Architectures.ipynb # QCNN, PQK, QGAN, Quanvolution, Dressed Circuit
+│   ├── 03_novel_explorations/               # Research explorations & building blocks
+│   │   ├── 01_RAM_QRSRE.ipynb                   # RAM-QRSRE — regime-adaptive multi-scale QML
+│   │   ├── 02_Quantum_Graph_Reservoir.ipynb     # QGR — spatial graph + quantum reservoir
+│   │   ├── 03_Conformal_Quantum_Prediction.ipynb # CQP — conformal uncertainty quantification
+│   │   └── 04_MultiTask_Quantum_Temporal_Fusion.ipynb # MQTF — joint fire + insurance prediction
+│   ├── 04_proposed_algorithm/               # ★ Competition entry — proposed algorithms
+│   │   ├── 01_QMoE_Fire.ipynb                   # Q-MoE Fire — best performer (F1=0.782, R²=0.535)
+│   │   ├── 02_QART.ipynb                        # QART — core architectural innovation
+│   │   └── 03_QCAST_Scenario_Transformer.ipynb  # Q-CAST — forward-looking "what if" scenario analysis
+│   └── 05_predictions/                      # Final deliverables
+│       └── 01_ZipCode_2026_Predictions.ipynb    # 2026 per-ZIP risk predictions
 ├── results/                           # Plots, CSVs, JSON outputs, interactive HTML maps
 ├── requirements.txt                   # Python dependencies
 └── README.md
@@ -75,7 +80,7 @@ Quantum Machine Learning solution for the Deloitte Quantum Sustainability Challe
 - **Q-MoE Fire (Quantum Mixture-of-Experts for Climate Regimes)** — 4 quantum reservoir experts with different entanglement topologies routed by KMeans climate regime clustering, soft/hard gating, per-regime specialization
 - **Q-CAST (Quantum Causal Scenario Transformer)** — forward-looking "what if" risk simulation: 6 climate/mitigation scenarios through quantum reservoir + conformal intervals, per-county impact analysis, decision-support dashboard
 
-**Exploratory (code written, results in Notebook 05):**
+**Exploratory (code written, results in `02_quantum_baselines/03_Cloud_Quantum_Models`):**
 - Trainable Quantum Kernel (kernel-target alignment optimization)
 - Quantum Transfer Learning (classical MLP + quantum head)
 - AWS Braket real hardware integration (IonQ Aria, Rigetti Ankaa, IQM Garnet)
@@ -123,38 +128,47 @@ pip install -r requirements.txt
 Run the notebooks in this order. Each notebook reads from `data/` and writes results to `results/`.
 
 ```
-01_EDA_and_Baselines          → Classical & quantum baselines for Task 1A
-    ↓                            Outputs: classical_baselines.json, SHAP plots
-02_Task2_Insurance_QML        → Classical & quantum baselines for Task 2
-    ↓                            Outputs: task2_results.csv, SHAP plots
-03_Geospatial_Visualization   → Risk maps + quantum resource analysis
-    ↓                            Outputs: california_fire_risk_map.png, scalability plots
-04_Clustering_UMAP_HDBSCAN    → ZIP-code risk clustering into 5 tiers
-    ↓                            Outputs: zip_cluster_labels.csv, zip_umap_embedding.csv
-04_Improved_Quantum_Models    → PCA, re-uploading, hybrid ensembles
-    ↓                            Outputs: improved_results.csv
-05_Cloud_Quantum_Models       → QRC, QLSTM, Trainable Kernel, Transfer Learning
-    ↓                            Outputs: advanced_quantum_results.json, resource table
-06_ZipCode_2026_Predictions   → Final per-ZIP risk predictions for 2026
-    ↓                            Outputs: zip_risk_predictions_2026.csv, executive_dashboard.png
-07_FullHistory_Wildfire_Analysis → 40-year wildfire trend analysis, concept drift detection
-                                 Outputs: climate_trends_40yr.png, seasonal analysis
-08_Advanced_Quantum_Architectures → QCNN, PQK, QGAN, Quanvolution, Dressed Circuit
-                                 Outputs: nb08_model_comparison.png, nb08_advanced_architectures_results.json
-09_Regime_Adaptive_Multiscale_QML → RAM-QRSRE novel algorithm
-                                 Outputs: ram_qrsre_results.json, ram_qrsre_ablation.csv
-10_Quantum_Adaptive_Reservoir_Transformer → QART — core novel algorithm (both tasks)
-                                 Outputs: qart_results.json, qart_ablation.csv, qart_comparison.png
-11_Quantum_Graph_Reservoir       → QGR — spatial graph + quantum reservoir (county-level)
-                                 Outputs: qgr_results.json, qgr_classification_overview.png
-12_Conformal_Quantum_Prediction  → CQP — conformal uncertainty on QRC (coverage guarantees)
-                                 Outputs: cqp_results.json, cqp_calibration.png, cqp_intervals.png
-13_MultiTask_Quantum_Temporal_Fusion → MQTF — joint fire + insurance with shared backbone
-                                 Outputs: mqtf_results.json, mqtf_comparison.png, mqtf_conformal.png
-14_QMoE_Fire                        → Q-MoE Fire — climate-regime-aware quantum mixture-of-experts
-                                 Outputs: qmoe_results.json, qmoe_overview.png
-15_QCAST_Scenario_Transformer       → Q-CAST — forward-looking "what if" scenario simulation
-                                 Outputs: qcast_results.json, qcast_dashboard.png, qcast_heatmap.png
+01_eda_and_visualization/
+  01_EDA_and_Baselines              → Classical & quantum baselines for Task 1A
+      ↓                                Outputs: classical_baselines.json, SHAP plots
+  02_Geospatial_Visualization       → Risk maps + quantum resource analysis
+      ↓                                Outputs: california_fire_risk_map.png, scalability plots
+  03_Clustering_UMAP_HDBSCAN        → ZIP-code risk clustering into 5 tiers
+      ↓                                Outputs: zip_cluster_labels.csv, zip_umap_embedding.csv
+  04_FullHistory_Wildfire_Analysis   → 40-year wildfire trend analysis, concept drift detection
+                                       Outputs: climate_trends_40yr.png, seasonal analysis
+
+02_quantum_baselines/
+  01_Task2_Insurance_QML             → Classical & quantum baselines for Task 2
+      ↓                                Outputs: task2_results.csv, SHAP plots
+  02_Improved_Quantum_Models         → PCA, re-uploading, hybrid ensembles
+      ↓                                Outputs: improved_results.csv
+  03_Cloud_Quantum_Models            → QRC, QLSTM, Trainable Kernel, Transfer Learning
+      ↓                                Outputs: advanced_quantum_results.json, resource table
+  04_Advanced_Quantum_Architectures  → QCNN, PQK, QGAN, Quanvolution, Dressed Circuit
+                                       Outputs: nb08_model_comparison.png, nb08_advanced_architectures_results.json
+
+03_novel_explorations/
+  01_RAM_QRSRE                       → RAM-QRSRE novel algorithm
+      ↓                                Outputs: ram_qrsre_results.json, ram_qrsre_ablation.csv
+  02_Quantum_Graph_Reservoir         → QGR — spatial graph + quantum reservoir (county-level)
+      ↓                                Outputs: qgr_results.json, qgr_classification_overview.png
+  03_Conformal_Quantum_Prediction    → CQP — conformal uncertainty on QRC (coverage guarantees)
+      ↓                                Outputs: cqp_results.json, cqp_calibration.png, cqp_intervals.png
+  04_MultiTask_Quantum_Temporal_Fusion → MQTF — joint fire + insurance with shared backbone
+                                       Outputs: mqtf_results.json, mqtf_comparison.png, mqtf_conformal.png
+
+04_proposed_algorithm/  ★ Competition entry
+  01_QMoE_Fire                       → Q-MoE Fire — climate-regime-aware quantum mixture-of-experts
+      ↓                                Outputs: qmoe_results.json, qmoe_overview.png
+  02_QART                            → QART — core novel algorithm (both tasks)
+      ↓                                Outputs: qart_results.json, qart_ablation.csv, qart_comparison.png
+  03_QCAST_Scenario_Transformer      → Q-CAST — forward-looking "what if" scenario simulation
+                                       Outputs: qcast_results.json, qcast_dashboard.png, qcast_heatmap.png
+
+05_predictions/
+  01_ZipCode_2026_Predictions        → Final per-ZIP risk predictions for 2026
+                                       Outputs: zip_risk_predictions_2026.csv, executive_dashboard.png
 ```
 
 All notebooks are committed with full cell outputs.
@@ -174,8 +188,8 @@ All notebooks are committed with full cell outputs.
 ### Model Explainability
 
 SHAP (SHapley Additive exPlanations) is used across notebooks to provide transparent feature attribution:
-- **NB01**: Beeswarm summary + waterfall plots for wildfire day predictions
-- **NB02**: Beeswarm summary + dependence plot for premium drivers
-- **NB06**: Beeswarm summary + top-5 riskiest ZIP waterfall breakdowns
+- **01_EDA_and_Baselines**: Beeswarm summary + waterfall plots for wildfire day predictions
+- **01_Task2_Insurance_QML**: Beeswarm summary + dependence plot for premium drivers
+- **01_ZipCode_2026_Predictions**: Beeswarm summary + top-5 riskiest ZIP waterfall breakdowns
 
 All SHAP visualizations are saved as PNGs in `results/` and embedded in notebook outputs.
