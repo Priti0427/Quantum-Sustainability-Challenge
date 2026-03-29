@@ -157,7 +157,7 @@ Run the notebooks in this order. Each notebook reads from `data/` and writes res
                                  Outputs: qcast_results.json, qcast_dashboard.png, qcast_heatmap.png
 ```
 
-Pre-executed notebooks (`*_executed.ipynb`) are included with full cell outputs.
+All notebooks are committed with full cell outputs.
 
 ### Data Assumptions for 2026 Predictions
 
