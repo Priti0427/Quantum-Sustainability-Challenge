@@ -1,0 +1,55 @@
+{
+  "task_1a": {
+    "random_forest": {
+      "f1": 0.6409,
+      "type": "classical"
+    },
+    "xgboost": {
+      "f1": 0.6383,
+      "type": "classical"
+    },
+    "qrc": {
+      "f1": 0.7241,
+      "qubits": 8,
+      "type": "quantum"
+    },
+    "trainable_kernel": {
+      "f1": 0.3871,
+      "qubits": 6,
+      "type": "quantum"
+    },
+    "transfer_learning": {
+      "f1": 0.6417,
+      "qubits": 4,
+      "type": "hybrid"
+    }
+  },
+  "task_2": {
+    "ridge": {
+<<<<<<< Updated upstream
+      "r2": 0.1802,
+      "type": "classical"
+    },
+    "qrc": {
+      "r2": 0.4304,
+=======
+      "r2": 0.3789,
+      "type": "classical"
+    },
+    "qrc": {
+      "r2": 0.1163,
+>>>>>>> Stashed changes
+      "qubits": 8,
+      "type": "quantum"
+    },
+    "qlstm": {
+<<<<<<< Updated upstream
+      "r2": 0.9221,
+=======
+      "r2": -0.2513,
+>>>>>>> Stashed changes
+      "qubits": 4,
+      "type": "quantum"
+    }
+  }
+}

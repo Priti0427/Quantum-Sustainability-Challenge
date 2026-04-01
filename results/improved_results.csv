@@ -1,0 +1,11 @@
+Task,Model,Metric,Value,Type
+1A,XGBoost (Classic),F1,0.6818,Classical
+1A,VQC (Old),F1,0.5417,Quantum-Old
+1A,Quantum Kernel SVM (Old),F1,0.6829,Quantum-Old
+1A,VQC Improved (Re-upload+PCA),F1,0.3333333333333333,Quantum-Improved
+1A,Hybrid Ensemble,F1,0.7047619047619048,Hybrid
+2,Linear Regression (Classic),R2,0.9654,Classical
+2,VQR (Old),R2,-0.0317,Quantum-Old
+2,Quantum Kernel Ridge (Old),R2,0.7331,Quantum-Old
+2,VQR Improved (Log+PCA),R2,-0.9815802458241953,Quantum-Improved
+2,Hybrid Ensemble,R2,0.9976843394079701,Hybrid

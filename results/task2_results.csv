@@ -1,0 +1,6 @@
+Model,Type,RMSE,R2
+Linear Regression,Classical,643386,0.9654
+Random Forest,Classical,782084,0.9489
+XGBoost,Classical,966413,0.922
+VQR (Quantum),Quantum,3046781,-0.0317
+Quantum Kernel Ridge,Quantum,1549595,0.7331

@@ -1,0 +1,39 @@
+# Quantum Computing — Qiskit
+qiskit
+qiskit-aer
+qiskit-machine-learning
+
+# Quantum Computing — PennyLane (Notebook 05 cloud models)
+pennylane>=0.39
+pennylane-qiskit
+
+# AWS Braket (only needed on AWS — comment out for local)
+# amazon-braket-sdk
+# amazon-braket-pennylane-plugin
+
+# Classical ML
+scikit-learn
+xgboost
+
+# Deep Learning (for QLSTM and Transfer Learning)
+torch>=2.0
+
+# Clustering
+umap-learn
+hdbscan
+
+# Data & Visualization
+pandas
+numpy
+matplotlib
+seaborn
+plotly
+kaleido
+openpyxl
+
+# Geospatial (optional — for choropleth maps)
+# geopandas
+
+# Jupyter
+jupyter
+ipykernel
