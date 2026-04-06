@@ -126,4 +126,3 @@ Run the notebooks in order. Each reads from `data/` and writes to `results/`.
   01 ZipCode Predictions   Final per-ZIP wildfire risk predictions
 ```
 
-All notebooks are committed with full cell outputs.
