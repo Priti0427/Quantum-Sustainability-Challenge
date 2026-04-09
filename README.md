@@ -2,7 +2,9 @@
 
 Hybrid quantum-classical solution for the **Deloitte Quantum Sustainability Challenge 2026**: predicting California wildfire risk and homeowners insurance premiums using regime-aware quantum mixture-of-experts, multi-task fusion, and quantum LSTM models.
 
-**Team:** Priti Sagar (Drexel University) · Gautam Mahajan (University of Connecticut – Storrs)
+**Team:** 
+- Priti Sagar (Drexel University)
+- Gautam Mahajan (University of Connecticut – Storrs)
 
 📄 Full submission: [SUBMISSION.md](SUBMISSION.md) · [SUBMISSION.pdf](SUBMISSION.pdf)
 
