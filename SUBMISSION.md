@@ -49,16 +49,18 @@ We present a hybrid quantum-classical system for California wildfire risk predic
 - **Wildfire data**: California wildfire records including fire name, location, county, burned acreage (GIS_ACRES), organized at monthly county-level granularity (10,989 rows, 58 counties, 2008-2020)
 - **Insurance data**: California Department of Insurance homeowners insurance filings - `insurance_2018_2019.XLS` and `insurance_2020_2021.XLS` - containing ZIP-level premiums, exposures, losses, and risk scores (~2,000 ZIPs per year)
 
-**Additional data used**:
-- **Daily weather data**: Temperature (min/max/avg), humidity, wind speed, precipitation, snow, sun hours - merged with fire occurrence at daily and monthly granularity. Source: aggregated weather station data included in `wildfire_county_monthly.csv`
-- **Historical wildfire data (1984-2025)**: Extended CalFire incident archive for long-term trend analysis (Full History notebook)
-- **CalFire risk maps**: ZIP-code-level fire risk scores used for 2026 predictions (ZIP-Code Predictions notebook)
+**Additional data used**: None. All analysis uses only the five challenge-provided files:
+- `wildfire_county_monthly.csv` — monthly county-level wildfire and weather records (2008–2020)
+- `wildfire_weather_daily.csv` — daily weather and fire occurrence records (used for temporal analysis and 2026 projections)
+- `insurance_2018_2019.XLS` — ZIP-level homeowners insurance premiums and risk scores
+- `insurance_2020_2021.XLS` — ZIP-level homeowners insurance premiums and risk scores
+- `geojson-counties-fips.json` — California county boundaries for geospatial visualisation
 
-No external APIs or real-time data feeds were used. All data is included in the repository.
+No external APIs, third-party datasets, or real-time data feeds were used.
 
 **Feature engineering**: Temperature range, wind-temperature ratio, lagged precipitation and wind speed, PCA-reduced quantum encodings (4 components), county adjacency graph features, temporal lag features (lag_acres, lag_temp), and domain-driven indicators (Fire Weather Index proxy, drought severity, hydroclimate whiplash signals).
 
-**Temporal split**: Train on 2008-2018, test on 2019-2020 (county-level wildfire); train on 2018-2020, test on 2021 (ZIP-level insurance). Note: the provided wildfire dataset covers 2008-2020; the insurance dataset covers 2018-2021.
+**Temporal split**: Train on 2008-2018, test on 2019-2020 (county-level wildfire); train on 2018-2020, test on 2021 (ZIP-level insurance). Note: the provided `wildfire_county_monthly.csv` ends at 2020-12; Q-MoE and RA-MQTF use 2008–2018 training to preserve a held-out 2019–2020 test set. For the challenge's 2018–2021 window, the insurance dataset (2018–2021) is used in full for Task 2, and the daily weather data (which extends to 2025) supplements the county-level wildfire data for trend analysis.
 
 ### 3.2 Task 1A: Wildfire Classification
 
