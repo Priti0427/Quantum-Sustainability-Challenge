@@ -8,12 +8,12 @@
 
 | Member | University | Email |
 |--------|-----------|-------|
-| Priti Sagar | Drexel University | ps3648@drexel.edu |
+| Priti Sagar | Drexel University | pp693@drexel.edu |
 | Gautam Mahajan | University of Connecticut - Storrs | gautam.mahajan@uconn.edu |
 
 ---
 
-## Section 2: Abstract (ONE page, ≤400 words)
+## Section 2: Abstract 
 
 We present a hybrid quantum-classical system for California wildfire risk prediction and insurance premium estimation, built in three validated layers.
 
