@@ -153,8 +153,3 @@ All analysis uses **only** the challenge-provided files (no external APIs or thi
 
 ---
 
-## Code Repository
-
-**https://github.com/Priti0427/Quantum-Sustainability-Challenge**
-
-See [SUBMISSION.md](SUBMISSION.md) for the full technical write-up, including the envisioned ZIP-STR-QMoE algorithm (Section 5).
