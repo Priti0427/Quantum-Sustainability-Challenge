@@ -151,5 +151,4 @@ All analysis uses **only** the challenge-provided files (no external APIs or thi
 - `insurance_2018_2019.XLS`, `insurance_2020_2021.XLS` — ZIP-level homeowners insurance premiums and risk scores
 - `geojson-counties-fips.json` — county boundaries for geospatial visualization
 
----
 
