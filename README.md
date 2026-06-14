@@ -12,9 +12,9 @@ Hybrid quantum-classical solution for the **Deloitte Quantum Sustainability Chal
 
 ## The Story in Three Validated Layers
 
-1. **Q-MoE Fire** — Regime-diverse quantum experts. California's 58 counties cluster into 4 climate regimes; each is routed through 4 fixed quantum reservoirs with different entanglement topologies (ring, ladder, star, full). **F1 = 0.782, AUC = 0.934** at county level, +10.3% over SVM, with per-regime improvements in all 4 climate zones.
-2. **RA-MQTF** — Multi-task fusion on top of Q-MoE expert features jointly predicts fire occurrence, severity, and premiums. Best wildfire classifier (**F1 = 0.834**, +17.6% over SVM) and best severity model (**R2 = 0.639**).
-3. **QLSTM** — 4-qubit variational LSTM gates for ZIP-level temporal premium prediction. **R2 = 0.349** on temporal log-scale splits, substantially outperforming Classical LSTM (R2 = −1.033).
+1. **Q-MoE Fire** : Regime-diverse quantum experts. California's 58 counties cluster into 4 climate regimes; each is routed through 4 fixed quantum reservoirs with different entanglement topologies (ring, ladder, star, full). **F1 = 0.782, AUC = 0.934** at county level, +10.3% over SVM, with per-regime improvements in all 4 climate zones.
+2. **RA-MQTF** : Multi-task fusion on top of Q-MoE expert features jointly predicts fire occurrence, severity, and premiums. Best wildfire classifier (**F1 = 0.834**, +17.6% over SVM) and best severity model (**R2 = 0.639**).
+3. **QLSTM** : 4-qubit variational LSTM gates for ZIP-level temporal premium prediction. **R2 = 0.349** on temporal log-scale splits, substantially outperforming Classical LSTM (R2 = −1.033).
 
 **Proposed algorithm:** [ZIP-STR-QMoE](SUBMISSION.md#section-5-envisioned-algorithm--zip-str-qmoe) extends these validated ingredients to direct ZIP-level prediction.
 
@@ -77,21 +77,21 @@ README.md
 ## Quantum Techniques
 
 **Primary competition entries** (`04_proposed_algorithm/`):
-- **Q-MoE Fire** — 4×4 qubits, topology-diverse fixed reservoirs (ring/ladder/star/full), regime routing + GradientBoosting head. Best single-task wildfire classifier (F1 = 0.782).
-- **RA-MQTF** — Q-MoE expert features + shared multi-task neural backbone. Best overall wildfire classifier (F1 = 0.834) and severity model (R2 = 0.639).
-- **QART** — Quantum Adaptive Reservoir Transformer with cross-attention (F1 = 0.755).
+- **Q-MoE Fire** : 4×4 qubits, topology-diverse fixed reservoirs (ring/ladder/star/full), regime routing + GradientBoosting head. Best single-task wildfire classifier (F1 = 0.782).
+- **RA-MQTF** : Q-MoE expert features + shared multi-task neural backbone. Best overall wildfire classifier (F1 = 0.834) and severity model (R2 = 0.639).
+- **QART** : Quantum Adaptive Reservoir Transformer with cross-attention (F1 = 0.755).
 - **Q-CAST** — Scenario analysis through the quantum pipeline (6 climate scenarios, conformal 90% intervals).
 
 **Cloud / NISQ-ready models** (`02_quantum_baselines/03_Cloud_Quantum_Models.ipynb`):
-- **QLSTM** — 4 qubits, variational LSTM gates with StronglyEntanglingLayers. Temporal premium model (R2 = 0.349, beats Classical LSTM R2 = −1.033). 144 trainable quantum parameters.
-- **QRC** — 8 qubits, 60-layer fixed reservoir baseline (F1 = 0.724).
+- **QLSTM** : 4 qubits, variational LSTM gates with StronglyEntanglingLayers. Temporal premium model (R2 = 0.349, beats Classical LSTM R2 = −1.033). 144 trainable quantum parameters.
+- **QRC** : 8 qubits, 60-layer fixed reservoir baseline (F1 = 0.724).
 - Trainable Quantum Kernel, Quantum Transfer Learning. AWS Braket integration for IonQ Aria, Rigetti Ankaa-3, IQM Garnet.
 
 **Supporting explorations** (`03_novel_explorations/`):
-- **CQP** — Conformal Quantum Prediction with ~90% empirical coverage.
-- **MQTF** — Multi-task temporal fusion (+69% F1, +588% R2 over single-task baselines, motivating RA-MQTF).
-- **QGR** — Quantum Graph Reservoir using county adjacency (F1 = 0.650).
-- **RAM-QRSRE** — Regime-adaptive multi-scale QML.
+- **CQP** : Conformal Quantum Prediction with ~90% empirical coverage.
+- **MQTF** : Multi-task temporal fusion (+69% F1, +588% R2 over single-task baselines, motivating RA-MQTF).
+- **QGR** : Quantum Graph Reservoir using county adjacency (F1 = 0.650).
+- **RAM-QRSRE** : Regime-adaptive multi-scale QML.
 
 **Baseline architectures** (`02_quantum_baselines/`):
 VQC, VQR, Quantum Kernel SVM, QCNN, PQK, QGAN, Quanvolutional NN, Dressed Quantum Circuit, PCA-reduced quantum encoders, data re-uploading classifiers.
