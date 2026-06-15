@@ -67,7 +67,7 @@ notebooks/
   05_predictions/                        # Final deliverables
     01_ZipCode_2026_Predictions.ipynb    # Per-ZIP wildfire risk predictions for 2,174 ZIPs
 results/                                 # Plots, CSVs, JSON outputs
-requirements.txt                         # Python dependencies
+requirements.txt                         # Dependencies
 SUBMISSION.md / SUBMISSION.pdf           # Competition submission document
 README.md
 ```
