@@ -66,7 +66,7 @@ notebooks/
     04_RegimeAware_MQTF.ipynb            # RA-MQTF — best model (F1 = 0.834, R2 = 0.639)
   05_predictions/                        # Final deliverables
     01_ZipCode_2026_Predictions.ipynb    # Per-ZIP wildfire risk predictions for 2,174 ZIPs
-results/                                 # Plots, CSVs, JSON outputs
+results/                                 # Outputs
 requirements.txt                         # Dependencies
 SUBMISSION.md / SUBMISSION.pdf           # Competition submission document
 README.md
