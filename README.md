@@ -145,7 +145,7 @@ All 17 notebooks include pre-executed cell outputs for reproducibility. Run them
 
 ## Data
 
-All analysis uses **only** the challenge-provided files (no external APIs or third-party datasets):
+All analysis uses **only** the challenge-provided files:
 - `wildfire_county_monthly.csv` — monthly county-level wildfire and weather records (2008–2020)
 - `wildfire_weather_daily.csv` — daily weather and fire occurrence (used for temporal trend analysis and 2026 projections)
 - `insurance_2018_2019.XLS`, `insurance_2020_2021.XLS` — ZIP-level homeowners insurance premiums and risk scores
